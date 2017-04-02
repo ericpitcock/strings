@@ -681,18 +681,25 @@ export default {
       // input checked or nah
     },
     translate: function() {
+      // empty translations
+      this.translations = [];
+
+      // get the word to translate
       var text = this.word;
 
-      for (var i = 0; i < this.selectedLanguages.length; i++) {
-        var lang = this.selectedLanguages[i];
-        this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + lang + '')
-        .then((response) => {
-          //console.log(response.json());
-          //console.log(response);
-          this.translations.push(response.data.text[0]);
-        }, (response) => {
-          console.log('Error');
-        });
+      for (var language in this.languages) {
+        if (this.languages[language]['selected'] == true) {
+          var lang = [language];
+
+          this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + lang + '')
+          .then((response) => {
+            //console.log(response.json());
+            //console.log(response);
+            this.translations.push(response.data.text[0]);
+          }, (response) => {
+            console.log('Error');
+          });
+        }
       }
       console.log(this.translations);
     },
