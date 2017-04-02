@@ -115,7 +115,7 @@
     <div class="language-list">
       <div class="select-control">Select: <button class="select-all" type="button" name="button">All</button> <button class="select-none" type="button" name="button">None</button></div>
       <label v-for="(language, index) in languages" v-bind:class="index">
-        <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages">{{ language.language }}
+        <input class="language" type="checkbox" v-bind:value="index" v-model="languages[index].selected">{{ language.language }}
       </label>
     </div>
     <div class="translation">
@@ -132,9 +132,6 @@ export default {
   name: 'app',
   data() {
     return {
-      selectedLanguages: [
-        'nl', 'en', 'fr', 'de', 'it', 'pl', 'pt', 'ru', 'es', 'tr', 'vi', 'ar', 'zh', 'ja', 'ko', 'th'
-      ],
       languages: {
         'nl': {
           'language': 'Dutch',
