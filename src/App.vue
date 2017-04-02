@@ -12,9 +12,6 @@
     color: #555;
   }
 
-  form {
-  }
-
   .controls {
     background: #555;
   }
@@ -122,11 +119,9 @@
       </label>
     </div>
     <div class="translation">
-      <form @submit.prevent="translate">
-        <input v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
-      </form>
+      <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
       <div class="output">
-        <p v-if="data"></p>
+        <!-- <p v-if="data"></p> -->
       </div>
     </div>
   </div>
@@ -677,7 +672,7 @@ export default {
         }
       },
       word: '',
-      data: [],
+      translations: [],
       errorMsg: ''
     }
   },
@@ -685,22 +680,21 @@ export default {
     checked: function() {
       // input checked or nah
     },
-    translate: function(text, lang) {
-      this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=boat&lang=en-es')
-      .then((response) => {
-        //console.log(response.json());
-        console.log(response);
-        console.log(response.data.text[0]);
-      }, (response) => {
-        console.log('Error');
-      });
+    translate: function() {
+      var text = this.word;
 
-      // translateText:function(text, language){
-      // this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170329T180255Z.3c18d2dc7b65d525.f23ed9a9efa992bded4ef96334e3c154f61d2dea&lang='+language+'&text='+text)
-      // .then((response) => {
-      //   this.translatedText = response.body.text[0];
-      // });
-
+      for (var i = 0; i < this.selectedLanguages.length; i++) {
+        var lang = this.selectedLanguages[i];
+        this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + lang + '')
+        .then((response) => {
+          //console.log(response.json());
+          //console.log(response);
+          this.translations.push(response.data.text[0]);
+        }, (response) => {
+          console.log('Error');
+        });
+      }
+      console.log(this.translations);
     },
     selectInputs: function() {
       // select all or none
