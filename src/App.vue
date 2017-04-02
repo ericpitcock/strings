@@ -117,13 +117,17 @@
   <div id="app">
     <div class="language-list">
       <div class="select-control">Select: <button class="select-all" type="button" name="button">All</button> <button class="select-none" type="button" name="button">None</button></div>
-      <label v-for="(language, index) in languages">
-        <input class="language" type="checkbox" v-bind:value="index">{{ language.language }}
+      <label v-for="(language, index) in languages" v-bind:class="index">
+        <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages">{{ language.language }}
       </label>
     </div>
     <div class="translation">
-      <input class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
-      <div class="output"></div>
+      <form @submit.prevent="translate">
+        <input v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
+      </form>
+      <div class="output">
+        <p v-if="data"></p>
+      </div>
     </div>
   </div>
 </template>
@@ -133,6 +137,9 @@ export default {
   name: 'app',
   data() {
     return {
+      selectedLanguages: [
+        'nl', 'en', 'fr', 'de', 'it', 'pl', 'pt', 'ru', 'es', 'tr', 'vi', 'ar', 'zh', 'ja', 'ko', 'th'
+      ],
       languages: {
         'nl': {
           'language': 'Dutch',
@@ -668,7 +675,35 @@ export default {
           'selected': false,
           'translation': ''
         }
-      }
+      },
+      word: '',
+      data: [],
+      errorMsg: ''
+    }
+  },
+  methods: {
+    checked: function() {
+      // input checked or nah
+    },
+    translate: function(text, lang) {
+      this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=boat&lang=en-es')
+      .then((response) => {
+        //console.log(response.json());
+        console.log(response);
+        console.log(response.data.text[0]);
+      }, (response) => {
+        console.log('Error');
+      });
+
+      // translateText:function(text, language){
+      // this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170329T180255Z.3c18d2dc7b65d525.f23ed9a9efa992bded4ef96334e3c154f61d2dea&lang='+language+'&text='+text)
+      // .then((response) => {
+      //   this.translatedText = response.body.text[0];
+      // });
+
+    },
+    selectInputs: function() {
+      // select all or none
     }
   }
 }
