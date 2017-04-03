@@ -121,7 +121,9 @@
     <div class="translation">
       <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
       <div class="output">
-        <!-- <p v-if="data"></p> -->
+        <!-- <p v-for="(language, index) in languages" v-if="languages[index].selected">
+          {{ languages.translation }}
+        </p> -->
       </div>
     </div>
   </div>
@@ -669,7 +671,6 @@ export default {
         }
       },
       word: '',
-      translations: [],
       errorMsg: ''
     }
   },
@@ -678,27 +679,34 @@ export default {
       // input checked or nah
     },
     translate: function() {
-      // empty translations
-      this.translations = [];
-
       // get the word to translate
       var text = this.word;
+      var lang;
 
       for (var language in this.languages) {
-        if (this.languages[language]['selected'] == true) {
-          var lang = [language];
+        if (this.languages[language].selected === true) {
+          // console.log(language); // code
+          // console.log(this.languages[language].language);
+          // console.log(this.languages[language].tier);
+          // console.log(this.languages[language].selected);
+          // console.log(this.languages[language].translation);
+
+          lang = language;
 
           this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + lang + '')
           .then((response) => {
-            //console.log(response.json());
             //console.log(response);
-            this.translations.push(response.data.text[0]);
+            // add translation to languages object
+            this.languages[language].translation = response.data.text[0];
+            console.log(this.languages[language].translation);
           }, (response) => {
             console.log('Error');
           });
         }
       }
-      console.log(this.translations);
+    },
+    outputTranslations: function() {
+      console.log(this.languages);
     },
     selectInputs: function() {
       // select all or none
