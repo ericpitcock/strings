@@ -121,9 +121,11 @@
     <div class="translation">
       <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
       <div class="output">
-        <!-- <p v-for="(language, index) in languages" v-if="languages[index].selected">
-          {{ languages.translation }}
-        </p> -->
+        <p v-for="(row, index) in output">
+          {{ row.language }}
+          {{ row.code }}
+          {{ row.translation }}
+        </p>
       </div>
     </div>
   </div>
@@ -695,7 +697,7 @@ export default {
             lang;
         // translate and add to object
         //for (var _language in self.languages) {
-        _.forIn(self.languages, function(key, value) {
+        _.forIn(this.languages, function(key, value) {
           //console.log([value][0]);
           var code = [value][0],
               language = key.language;
@@ -714,7 +716,7 @@ export default {
           }
         });
 
-        self.outputTranslations();
+        this.outputTranslations();
 
       }, 500),
     outputTranslations: function() {
