@@ -130,6 +130,8 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
   name: 'app',
   data() {
@@ -671,42 +673,52 @@ export default {
         }
       },
       word: '',
+      output: [],
       errorMsg: ''
     }
   },
+  // watch: {
+  //   word: function() {
+  //     this.translate();
+  //   }
+  // },
   methods: {
     checked: function() {
       // input checked or nah
     },
-    translate: function() {
-      // get the word to translate
-      var text = this.word;
-      var lang;
+    // https://vuejs.org/v2/guide/computed.html
+    translate: _.debounce(
+      function() {
+        // get the word to translate
+        var self = this,
+            text = this.word,
+            lang;
+        // translate and add to object
+        //for (var _language in self.languages) {
+        _.forIn(self.languages, function(key, value) {
+          //console.log([value][0]);
+          var code = [value][0],
+              language = key.language;
+          if (key.selected === true) {
+            self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
+            .then(function(response) {
+              //var temp = [];
+              self.output.push({
+                language: language,
+                code: code,
+                translation: response.data.text[0]
+              });
+            }, function(response) {
+              console.log('Error');
+            });
+          }
+        });
 
-      for (var language in this.languages) {
-        if (this.languages[language].selected === true) {
-          // console.log(language); // code
-          // console.log(this.languages[language].language);
-          // console.log(this.languages[language].tier);
-          // console.log(this.languages[language].selected);
-          // console.log(this.languages[language].translation);
+        self.outputTranslations();
 
-          lang = language;
-
-          this.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + lang + '')
-          .then((response) => {
-            //console.log(response);
-            // add translation to languages object
-            this.languages[language].translation = response.data.text[0];
-            console.log(this.languages[language].translation);
-          }, (response) => {
-            console.log('Error');
-          });
-        }
-      }
-    },
+      }, 500),
     outputTranslations: function() {
-      console.log(this.languages);
+      console.log(this.output);
     },
     selectInputs: function() {
       // select all or none
