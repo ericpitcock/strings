@@ -8,8 +8,13 @@
 
   body, input, textarea {
     font-family: 'Noto Sans', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
+    line-height: 1;
     color: #555;
+  }
+
+  .small {
+    font-size: 12px;
   }
 
   .controls {
@@ -34,7 +39,7 @@
     }
 
     label {
-      margin-bottom: 5px;
+      margin-bottom: 10px;
 
       input {
         margin-right: 5px;
@@ -53,14 +58,13 @@
     }
   }
 
-  .translation {
+  .translation-cont {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 200px;
     overflow: scroll;
-    //padding: 30px;
     background: #fff;
 
     &::-webkit-scrollbar {
@@ -80,25 +84,48 @@
       }
     }
 
-    .output {
-      padding: 80px 0 0 30px;
+    table.output {
+      width: 100%;
+      margin: 90px 0 0 30px;
+      text-align: left;
 
-      p {
-        padding: 5px 0;
-        border-bottom: 1px solid #e6e6e6;
+      thead {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: red;
 
-        span.lang-label {
-          display: inline-block;
-          width: 150px;
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #999;
+        tr th {
+          padding-bottom: 10px;
         }
 
-        span.translation-string {
-          font-size: 18px;
-          color: #555;
+        th.language {
+          width: 200px;
+        }
+
+        th.translation {
+
+        }
+      }
+
+      tr {
+        border-bottom: 1px solid #e6e6e6;
+
+        td {
+          height: 40px;
+          vertical-align: middle;
+
+          span.lang-label {
+            display: inline-block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            padding-left: 5px;
+          }
+
+          .translation-string {
+            //font-size: 16px;
+          }
         }
       }
     }
@@ -112,21 +139,30 @@
 
 <template>
   <div id="app">
-    <div class="language-list">
+    <div class="language-list small">
       <div class="select-control">Select: <button class="select-all" type="button" name="button">All</button> <button class="select-none" type="button" name="button">None</button></div>
       <label v-for="(language, index) in languages" v-bind:class="index">
         <input class="language" type="checkbox" v-bind:value="index" v-model="languages[index].selected">{{ language.language }}
       </label>
     </div>
-    <div class="translation">
+    <div class="translation-cont">
       <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
-      <div class="output">
-        <p v-for="(row, index) in output">
-          {{ row.language }}
-          {{ row.code }}
-          {{ row.translation }}
-        </p>
-      </div>
+      <table class="output">
+        <thead class="small">
+          <tr>
+            <th class="language">Language</th>
+            <th class="translation">Translation</th>
+            <th class="character-count">Character Count</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in sortOutput(output)" v-model="output">
+          <td>{{ item.language }}<span class="lang-label">{{ item.code }}</span></td>
+          <td><span class="translation-string">{{ item.translation }}</span></td>
+          <td>{{ item.characterCount }}</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -679,11 +715,17 @@ export default {
       errorMsg: ''
     }
   },
-  // watch: {
-  //   word: function() {
-  //     this.translate();
-  //   }
-  // },
+  watch: {
+    languages: function() {
+
+    },
+    word: function() {
+      //this.translate();
+    },
+    output: function() {
+      //return _.sortBy(this.output, 'characterCount');
+    }
+  },
   methods: {
     checked: function() {
       // input checked or nah
@@ -708,7 +750,8 @@ export default {
               self.output.push({
                 language: language,
                 code: code,
-                translation: response.data.text[0]
+                translation: response.data.text[0],
+                characterCount: response.data.text[0].length
               });
             }, function(response) {
               console.log('Error');
@@ -716,14 +759,21 @@ export default {
           }
         });
 
-        this.outputTranslations();
+        this.consoleOutput();
 
       }, 500),
-    outputTranslations: function() {
+    consoleOutput: function() {
       console.log(this.output);
     },
-    selectInputs: function() {
-      // select all or none
+    sortOutput: function(data) {
+      return _.sortBy(data, 'characterCount');
+    },
+    selectInputs: function(which) {
+      if (which == "all") {
+
+      } else {
+
+      }
     }
   }
 }
