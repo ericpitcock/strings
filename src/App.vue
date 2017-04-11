@@ -766,7 +766,12 @@ export default {
       console.log(this.output);
     },
     sortOutput: function(data) {
-      return _.sortBy(data, 'characterCount');
+      // return _.sortBy(data, 'characterCount');
+      return _
+      .chain(data)
+      .sortBy('characterCount')
+      .reverse()
+      .value();
     },
     selectInputs: function(which) {
       if (which == "all") {
