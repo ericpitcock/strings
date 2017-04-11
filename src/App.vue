@@ -742,24 +742,27 @@ export default {
     // https://vuejs.org/v2/guide/computed.html
     translate: _.debounce(
       function() {
-        if (this.word != '') {
-
+        if (this.word == '') {
+          // clear the output
+          this.output = [];
+          console.log('the input is empty');
+        } else {
+          // clear the output
           this.output = [];
 
           // get the word to translate
           var self = this,
               text = this.word,
               lang;
+
           // translate and add to object
-          //for (var _language in self.languages) {
           _.forIn(this.languages, function(key, value) {
-            //console.log([value][0]);
             var code = [value][0],
                 language = key.language;
+
             if (key.selected === true) {
               self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
               .then(function(response) {
-                //var temp = [];
                 self.output.push({
                   language: language,
                   code: code,
@@ -771,14 +774,10 @@ export default {
               });
             }
           });
+
+          console.log(this.output);
         }
-
-        this.consoleOutput();
-
       }, 500),
-    consoleOutput: function() {
-      console.log(this.output);
-    },
     selectInputs: function(which) {
       if (which == "all") {
 
