@@ -156,7 +156,7 @@
           </tr>
         </thead>
         <tbody>
-        <tr v-for="item in sortOutput(output)" v-model="output">
+        <tr v-for="item in sortOutput" v-model="output">
           <td>{{ item.language }}<span class="lang-label">{{ item.code }}</span></td>
           <td><span class="translation-string">{{ item.translation }}</span></td>
           <td>{{ item.characterCount }}</td>
@@ -715,15 +715,24 @@ export default {
       errorMsg: ''
     }
   },
+  computed: {
+    sortOutput: function() {
+      return _
+      .chain(this.output)
+      .sortBy('characterCount')
+      .reverse()
+      .value();
+    },
+  },
   watch: {
     languages: function() {
 
     },
     word: function() {
-      //this.translate();
+      this.translate();
     },
     output: function() {
-      //return _.sortBy(this.output, 'characterCount');
+
     }
   },
   methods: {
@@ -733,45 +742,42 @@ export default {
     // https://vuejs.org/v2/guide/computed.html
     translate: _.debounce(
       function() {
-        // get the word to translate
-        var self = this,
-            text = this.word,
-            lang;
-        // translate and add to object
-        //for (var _language in self.languages) {
-        _.forIn(this.languages, function(key, value) {
-          //console.log([value][0]);
-          var code = [value][0],
-              language = key.language;
-          if (key.selected === true) {
-            self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
-            .then(function(response) {
-              //var temp = [];
-              self.output.push({
-                language: language,
-                code: code,
-                translation: response.data.text[0],
-                characterCount: response.data.text[0].length
+        if (this.word != '') {
+
+          this.output = [];
+
+          // get the word to translate
+          var self = this,
+              text = this.word,
+              lang;
+          // translate and add to object
+          //for (var _language in self.languages) {
+          _.forIn(this.languages, function(key, value) {
+            //console.log([value][0]);
+            var code = [value][0],
+                language = key.language;
+            if (key.selected === true) {
+              self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
+              .then(function(response) {
+                //var temp = [];
+                self.output.push({
+                  language: language,
+                  code: code,
+                  translation: response.data.text[0],
+                  characterCount: response.data.text[0].length
+                });
+              }, function(response) {
+                console.log('Error');
               });
-            }, function(response) {
-              console.log('Error');
-            });
-          }
-        });
+            }
+          });
+        }
 
         this.consoleOutput();
 
       }, 500),
     consoleOutput: function() {
       console.log(this.output);
-    },
-    sortOutput: function(data) {
-      // return _.sortBy(data, 'characterCount');
-      return _
-      .chain(data)
-      .sortBy('characterCount')
-      .reverse()
-      .value();
     },
     selectInputs: function(which) {
       if (which == "all") {
