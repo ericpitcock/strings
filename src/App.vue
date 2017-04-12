@@ -717,11 +717,7 @@ export default {
   },
   computed: {
     sortOutput: function() {
-      return _
-      .chain(this.output)
-      .sortBy('characterCount')
-      .reverse()
-      .value();
+      return _.orderBy(this.output, 'characterCount', 'desc');
     },
   },
   watch: {
