@@ -132,7 +132,7 @@
 <template>
   <div id="app">
     <div class="language-list small">
-      <div class="select-control">Select: <button class="select-all" type="button" name="button">All</button> <button class="select-none" type="button" name="button">None</button></div>
+      <div class="select-control">Select: <button @click="selectInputs('all')" class="select-all" type="button" name="button">All</button> <button @click="selectInputs('none')" class="select-none" type="button" name="button">None</button></div>
       <label v-for="(language, index) in languages" v-bind:class="index">
         <input class="language" type="checkbox" v-bind:value="index" v-model="languages[index].selected" @change="translate">{{ language.language }}
       </label>
@@ -713,20 +713,11 @@ export default {
     },
   },
   watch: {
-    languages: function() {
-
-    },
     word: function() {
       this.translate();
-    },
-    output: function() {
-
     }
   },
   methods: {
-    checked: function() {
-      // input checked or nah
-    },
     // https://vuejs.org/v2/guide/computed.html
     translate: _.debounce(
       function() {
@@ -767,11 +758,21 @@ export default {
         }
       }, 500),
     selectInputs: function(which) {
+      var self = this;
       if (which == "all") {
-
+        //console.log('you selected all');
+        _.forIn(this.languages, function(key, value) {
+          var code = [value][0];
+          self.languages[code].selected = true;
+        });
       } else {
-
+        //console.log('you selected none');
+        _.forIn(this.languages, function(key, value) {
+          var code = [value][0];
+          self.languages[code].selected = false;
+        });
       }
+      this.translate();
     }
   }
 }
