@@ -29,28 +29,22 @@
     overflow: scroll;
     padding: 30px;
     background: #e6e6e6;
-
     &::-webkit-scrollbar {
       display: none;
     }
-
     .select-control {
       margin-bottom: 20px;
     }
-
     label {
       margin-bottom: 10px;
-
       input {
         margin-right: 5px;
         vertical-align: baseline;
-
         &:focus {
           outline: none;
         }
       }
     }
-
     .th {
       padding-bottom: 20px;
       border-bottom: 1px solid #ccc;
@@ -66,11 +60,9 @@
     left: 200px;
     overflow: scroll;
     background: #fff;
-
     &::-webkit-scrollbar {
       display: none;
     }
-
     input {
       position: fixed;
       width: 100%;
@@ -78,55 +70,55 @@
       border: none;
       padding-left: 30px;
       background: #f3f3f3;
-
       &:focus {
         outline: none;
       }
     }
-
     table.output {
       width: 100%;
-      margin: 90px 0 0 30px;
+      //max-width: 600px;
+      margin-top: 90px;
       text-align: left;
-
       thead {
         text-transform: uppercase;
         letter-spacing: 1px;
         color: red;
-
         tr th {
           padding-bottom: 10px;
         }
-
-        th.language {
-          width: 200px;
+        tr {
+          border-bottom: 1px solid #e6e6e6;
         }
-
-        th.translation {
-
+        th {
+          width: 33.333%;
         }
       }
-
-      tr {
-        border-bottom: 1px solid #e6e6e6;
-
-        td {
-          height: 40px;
-          vertical-align: middle;
-
-          span.lang-label {
-            display: inline-block;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #999;
-            padding-left: 5px;
+      tbody {
+        tr {
+          border-bottom: 1px solid #e6e6e6;
+          &:nth-child(odd) {
+            background: #f9f9f9;
           }
-
-          .translation-string {
-            //font-size: 16px;
+          td {
+            height: 40px;
+            vertical-align: middle;
+            span.lang-label {
+              display: inline-block;
+              font-size: 10px;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              color: #999;
+              padding-left: 5px;
+            }
+            .translation-string {
+              //font-size: 16px;
+            }
           }
         }
+      }
+      th:first-child,
+      td:first-child {
+        padding-left: 30px;
       }
     }
   }
@@ -142,7 +134,7 @@
     <div class="language-list small">
       <div class="select-control">Select: <button class="select-all" type="button" name="button">All</button> <button class="select-none" type="button" name="button">None</button></div>
       <label v-for="(language, index) in languages" v-bind:class="index">
-        <input class="language" type="checkbox" v-bind:value="index" v-model="languages[index].selected">{{ language.language }}
+        <input class="language" type="checkbox" v-bind:value="index" v-model="languages[index].selected" @change="translate">{{ language.language }}
       </label>
     </div>
     <div class="translation-cont">
