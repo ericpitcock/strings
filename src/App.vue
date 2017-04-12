@@ -127,6 +127,18 @@
     display: block;
     margin-bottom: 10px;
   }
+
+  .slide-fade-enter-active {
+    transition: opacity 1s ease-in-out;
+  }
+  .slide-fade-leave-active {
+    transition: opacity .3s ease-in-out;
+  }
+  .slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active for <2.1.8 */ {
+    //transform: translateX(10px);
+    opacity: 0;
+  }
 </style>
 
 <template>
@@ -139,7 +151,8 @@
     </div>
     <div class="translation-cont">
       <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
-      <table class="output">
+      <transition name="slide-fade">
+      <table class="output" v-if="hasOutput">
         <thead class="small">
           <tr>
             <th class="language">Language</th>
@@ -155,6 +168,7 @@
         </tr>
         </tbody>
       </table>
+      </transition>
     </div>
   </div>
 </template>
@@ -704,12 +718,14 @@ export default {
       },
       word: '',
       output: [],
+      hasOutput: false,
       errorMsg: ''
     }
   },
   computed: {
     sortOutput: function() {
       return _.orderBy(this.output, 'characterCount', 'desc');
+      this.hasOutput = true;
     },
   },
   watch: {
@@ -724,6 +740,7 @@ export default {
         if (this.word == '') {
           // clear the output
           this.output = [];
+          this.hasOutput = false;
           console.log('the input is empty');
         } else {
           // clear the output
@@ -753,7 +770,7 @@ export default {
               });
             }
           });
-
+          this.hasOutput = true;
           console.log(this.output);
         }
       }, 500),
