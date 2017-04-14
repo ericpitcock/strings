@@ -110,9 +110,6 @@
               color: #999;
               padding-left: 5px;
             }
-            .translation-string {
-              //font-size: 16px;
-            }
           }
         }
       }
@@ -163,7 +160,7 @@
         <tbody>
         <tr v-for="item in sortOutput" v-model="output">
           <td>{{ item.language }}<span class="lang-label">{{ item.code }}</span></td>
-          <td><span class="translation-string">{{ item.translation }}</span></td>
+          <td><span v-bind:class="item.code">{{ item.translation }}</span></td>
           <td>{{ item.characterCount }}</td>
         </tr>
         </tbody>
