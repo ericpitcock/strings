@@ -2,6 +2,15 @@
   @import '../node_modules/html5-reset/assets/css/reset';
   @import 'assets/_fonts';
 
+  @mixin block() {
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 10px rgba(0,0,0,.1);
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   html::-webkit-scrollbar {
     display: none;
   }
@@ -9,7 +18,9 @@
   body, input, textarea {
     font-family: 'Noto Sans', sans-serif;
     font-size: 14px;
+    font-weight: 400;
     line-height: 1;
+    background: #f6f6f6;
     color: #555;
   }
 
@@ -21,17 +32,23 @@
     background: #555;
   }
 
-  .language-list {
+  h1 {
     position: absolute;
     top: 0;
-    bottom: 0;
+    left: 32px;
+    font-size: 16px;
+    line-height: 60px;
+  }
+
+  .language-list {
+    position: absolute;
+    top: 60px;
+    bottom: 30px;
+    left: 30px;
     width: 200px;
     overflow: scroll;
     padding: 30px;
-    background: #e6e6e6;
-    &::-webkit-scrollbar {
-      display: none;
-    }
+    @include block();
     .select-control {
       margin-bottom: 20px;
     }
@@ -47,50 +64,52 @@
     }
     .th {
       padding-bottom: 20px;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid #f2f2f2;
       margin-bottom: 20px;
+    }
+  }
+
+  input.word-input {
+    position: absolute;
+    top: 60px;
+    left: 260px;
+    width: 100%;
+    max-width: 450px;
+    height: 60px;
+    border: none;
+    padding-left: 30px;
+    @include block();
+    &:focus {
+      outline: none;
     }
   }
 
   .translation-cont {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 200px;
+    top: 150px;
+    right: 30px;
+    bottom: 30px;
+    left: 260px;
     overflow: scroll;
-    background: #fff;
+    @include block();
     &::-webkit-scrollbar {
       display: none;
-    }
-    input {
-      position: fixed;
-      width: 100%;
-      height: 60px;
-      border: none;
-      padding-left: 30px;
-      background: #f3f3f3;
-      &:focus {
-        outline: none;
-      }
     }
     table.output {
       width: 100%;
       //max-width: 600px;
-      margin-top: 90px;
+      margin: 30px 0;
       text-align: left;
       thead {
         text-transform: uppercase;
         letter-spacing: 1px;
         color: red;
-        tr th {
-          padding-bottom: 10px;
-        }
         tr {
           border-bottom: 1px solid #e6e6e6;
         }
         th {
           width: 33.333%;
+          padding-bottom: 10px;
         }
       }
       tbody {
@@ -125,30 +144,29 @@
     margin-bottom: 10px;
   }
 
-  .slide-fade-enter-active {
+  .fade-enter-active {
     transition: opacity 1s ease-in-out;
   }
-  .slide-fade-leave-active {
+  .fade-leave-active {
     transition: opacity .3s ease-in-out;
   }
-  .slide-fade-enter, .slide-fade-leave-to
-  /* .slide-fade-leave-active for <2.1.8 */ {
-    //transform: translateX(10px);
+  .fade-enter, .fade-leave-to {
     opacity: 0;
   }
 </style>
 
 <template>
   <div id="app">
+    <h1>Translate</h1>
     <div class="language-list small">
       <div class="select-control">Select: <button @click="selectInputs('all')" class="select-all" type="button" name="button">All</button> <button @click="selectInputs('none')" class="select-none" type="button" name="button">None</button></div>
       <label v-for="(language, index) in languages" v-bind:class="index">
         <input class="language" type="checkbox" v-bind:value="index" v-model="languages[index].selected" @change="translate">{{ language.language }}
       </label>
     </div>
+    <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
     <div class="translation-cont">
-      <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
-      <transition name="slide-fade">
+      <transition name="fade">
       <table class="output" v-if="hasOutput">
         <thead class="small">
           <tr>
@@ -158,7 +176,7 @@
           </tr>
         </thead>
         <tbody>
-        <tr v-for="item in sortOutput" v-model="output">
+        <tr v-for="item in sortOutput" v-model="sortOutput">
           <td>{{ item.language }}<span class="lang-label">{{ item.code }}</span></td>
           <td><span v-bind:class="item.code">{{ item.translation }}</span></td>
           <td>{{ item.characterCount }}</td>
@@ -738,7 +756,7 @@ export default {
           // clear the output
           this.output = [];
           this.hasOutput = false;
-          console.log('the input is empty');
+          //console.log('the input is empty');
         } else {
           // clear the output
           this.output = [];
@@ -763,12 +781,12 @@ export default {
                   characterCount: response.data.text[0].length
                 });
               }, function(response) {
-                console.log('Error');
+                //console.log('Error');
               });
             }
           });
           this.hasOutput = true;
-          console.log(this.output);
+          //console.log(this.output);
         }
       }, 500),
     selectInputs: function(which) {
