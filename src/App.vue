@@ -107,6 +107,11 @@
     &::-webkit-scrollbar {
       display: none;
     }
+    .loading {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
     table.output {
       width: 100%;
       //max-width: 600px;
@@ -178,7 +183,7 @@
     </div>
     <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
     <div class="translation-cont">
-
+      <div class="loading" v-show="isLoading"><img src="static/img/loading.svg" /></div>
       <table class="output">
         <thead class="small">
           <tr>
@@ -197,7 +202,6 @@
         </tbody>
         </transition>
       </table>
-
     </div>
   </div>
 </template>
@@ -745,7 +749,9 @@ export default {
           'translation': ''
         }
       },
+      selected: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
       word: '',
+      isLoading: false,
       output: [],
       hasOutput: false,
       errorMsg: ''
@@ -777,15 +783,14 @@ export default {
 
           // get the word to translate
           var self = this,
-              text = this.word,
-              lang;
+              text = this.word;
 
           // translate and add to object
-          _.forIn(this.languages, function(key, value) {
-            var code = [value][0],
-                language = key.language;
+          _.forIn(this.languages, function(value, key) {
+            var code = [key][0],
+                language = value.language;
 
-            if (key.selected === true) {
+            if (value.selected === true) {
               self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
               .then(function(response) {
                 self.output.push({
