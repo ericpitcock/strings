@@ -21,7 +21,7 @@
     font-weight: 400;
     line-height: 1;
     background: #f6f6f6;
-    color: #555;
+    color: black;
   }
 
   #app {
@@ -44,8 +44,10 @@
     position: absolute;
     top: 0;
     left: 32px;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 60px;
+    padding-left: 30px;
+    background: url(http://www.ericpitcock.com/assets/img/e.svg) left center no-repeat;
   }
 
   .language-list {
@@ -176,24 +178,26 @@
     </div>
     <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
     <div class="translation-cont">
-      <transition name="fade">
-      <table class="output" v-if="hasOutput">
+
+      <table class="output">
         <thead class="small">
           <tr>
             <th class="language">Language</th>
             <th class="translation">Translation</th>
-            <th class="character-count">Character Count</th>
+            <th class="character-count">Characters</th>
           </tr>
         </thead>
-        <tbody>
+        <transition name="fade">
+        <tbody v-if="hasOutput">
         <tr v-for="item in sortOutput" v-model="sortOutput">
           <td>{{ item.language }}<span class="lang-label">{{ item.code }}</span></td>
           <td><span v-bind:class="item.code">{{ item.translation }}</span></td>
           <td>{{ item.characterCount }}</td>
         </tr>
         </tbody>
+        </transition>
       </table>
-      </transition>
+
     </div>
   </div>
 </template>
