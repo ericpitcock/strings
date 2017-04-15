@@ -380,17 +380,12 @@ export default {
     selectInputs: function(which) {
       var self = this;
       if (which == "all") {
-        //console.log('you selected all');
-        _.forIn(this.languages, function(key, value) {
-          var code = [value][0];
-          self.languages[code].selected = true;
+        _.forEach(this.supportedLanguages, function(key, value) {
+          var code = value;
+          self.selectedLanguages.push(code);
         });
       } else {
-        //console.log('you selected none');
-        _.forIn(this.languages, function(key, value) {
-          var code = [value][0];
-          self.languages[code].selected = false;
-        });
+        this.selectedLanguages = [];
       }
       this.translate();
     },
