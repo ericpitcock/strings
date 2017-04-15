@@ -116,6 +116,9 @@
       line-height: 56px;
       text-align: center;
       color: #ccc;
+      &:hover {
+        color: red;
+      }
     }
   }
 
@@ -222,7 +225,7 @@
         <tbody v-if="output">
         <tr v-for="item in sortOutput" v-model="sortOutput">
           <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
-          <td><span v-bind:class="item.code"><input @click="selectText" class="translation" type="text" v-bind:value="item.translation" readonly></span></td>
+          <td><input @click="selectText" v-bind:class="item.code" class="translation" type="text" v-bind:value="item.translation" readonly></td>
           <td>{{ item.characterCount }}</td>
         </tr>
         </tbody>
