@@ -11,10 +11,6 @@
     }
   }
 
-  html::-webkit-scrollbar {
-    display: none;
-  }
-
   body, input, textarea {
     font-family: 'Noto Sans', sans-serif;
     font-size: 14px;
@@ -47,7 +43,7 @@
     font-size: 14px;
     line-height: 60px;
     padding-left: 30px;
-    background: url(http://www.ericpitcock.com/assets/img/e.svg) left center no-repeat;
+    background: url('http://www.ericpitcock.com/assets/img/e.svg') left center no-repeat;
   }
 
   .language-list {
@@ -63,10 +59,17 @@
       margin-bottom: 20px;
     }
     label {
+      display: block;
       margin-bottom: 10px;
+      &:hover {
+        color: red;
+      }
       input {
         margin-right: 5px;
         vertical-align: baseline;
+        &:hover {
+          cursor: pointer;
+        }
         &:focus {
           outline: none;
         }
@@ -89,6 +92,9 @@
     border: none;
     padding-left: 30px;
     @include block();
+    &::placeholder {
+      color: black;
+    }
     &:focus {
       outline: none;
     }
@@ -104,9 +110,6 @@
     max-width: 700px;
     overflow: scroll;
     @include block();
-    &::-webkit-scrollbar {
-      display: none;
-    }
     .loading {
       position: absolute;
       top: 10px;
@@ -114,7 +117,6 @@
     }
     table.output {
       width: 100%;
-      //max-width: 600px;
       margin: 30px 0;
       text-align: left;
       thead {
@@ -146,6 +148,14 @@
               color: #999;
               padding-left: 5px;
             }
+            input.translation {
+              border: none;
+              background: none;
+              cursor: pointer;
+              &:hover {
+                color: red;
+              }
+            }
           }
         }
       }
@@ -154,11 +164,6 @@
         padding-left: 30px;
       }
     }
-  }
-
-  input[type=text], label {
-    display: block;
-    margin-bottom: 10px;
   }
 
   .fade-enter-active {
@@ -177,8 +182,8 @@
     <h1>Translate</h1>
     <div class="language-list small">
       <div class="select-control">Select: <button @click="selectInputs('all')" class="select-all" type="button" name="button">All</button> <button @click="selectInputs('none')" class="select-none" type="button" name="button">None</button></div>
-      <label v-for="(language, index) in languages" v-bind:class="index">
-        <input class="language" type="checkbox" v-bind:value="index" v-model="languages[index].selected" @change="translate">{{ language.language }}
+      <label v-for="(language, index) in supportedLanguages" v-bind:class="index">
+        <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages" @change="translate">{{ language }}
       </label>
     </div>
     <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
@@ -187,16 +192,16 @@
       <table class="output">
         <thead class="small">
           <tr>
-            <th class="language">Language</th>
-            <th class="translation">Translation</th>
-            <th class="character-count">Characters</th>
+            <th>Language</th>
+            <th>Translation</th>
+            <th>Characters</th>
           </tr>
         </thead>
         <transition name="fade">
         <tbody v-if="hasOutput">
         <tr v-for="item in sortOutput" v-model="sortOutput">
-          <td>{{ item.language }}<span class="lang-label">{{ item.code }}</span></td>
-          <td><span v-bind:class="item.code">{{ item.translation }}</span></td>
+          <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
+          <td><span v-bind:class="item.code"><input @click="selectText" class="translation" type="text" v-bind:value="item.translation" readonly></span></td>
           <td>{{ item.characterCount }}</td>
         </tr>
         </tbody>
@@ -213,543 +218,98 @@ export default {
   name: 'app',
   data() {
     return {
-      languages: {
-        'nl': {
-          'language': 'Dutch',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'en': {
-          'language': 'English',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'fr': {
-          'language': 'French',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'de': {
-          'language': 'German',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'it': {
-          'language': 'Italian',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'pl': {
-          'language': 'Polish',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'pt': {
-          'language': 'Portuguese',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'ru': {
-          'language': 'Russian',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'es': {
-          'language': 'Spanish',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'tr': {
-          'language': 'Turkish',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'vi': {
-          'language': 'Vietnamese',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'ar': {
-          'language': 'Arabic',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'zh': {
-          'language': 'Chinese',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'ja': {
-          'language': 'Japanese',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'ko': {
-          'language': 'Korean',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'th': {
-          'language': 'Thai',
-          'tier': 1,
-          'selected': true,
-          'translation': ''
-        },
-        'af': {
-          'language': 'Afrikaans',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'sq': {
-          'language': 'Albanian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        // 'am': {
-        //   'language': 'Amharic',
-        //   'tier': 2,
-        //   'selected': false,
-        //   'translation': ''
-        // },
-        'hy': {
-          'language': 'Armenian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'az': {
-          'language': 'Azerbaijan',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ba': {
-          'language': 'Bashkir',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'eu': {
-          'language': 'Basque',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'be': {
-          'language': 'Belarusian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'bn': {
-          'language': 'Bengali',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'bs': {
-          'language': 'Bosnian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'bg': {
-          'language': 'Bulgarian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ca': {
-          'language': 'Catalan',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ceb': {
-          'language': 'Cebuano',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'hr': {
-          'language': 'Croatian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'cs': {
-          'language': 'Czech',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'da': {
-          'language': 'Danish',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'eo': {
-          'language': 'Esperanto',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'et': {
-          'language': 'Estonian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'fi': {
-          'language': 'Finnish',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'gl': {
-          'language': 'Galician',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ka': {
-          'language': 'Georgian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'el': {
-          'language': 'Greek',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'gu': {
-          'language': 'Gujarati',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ht': {
-          'language': 'Haitian (Creole)',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'he': {
-          'language': 'Hebrew',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'mrj': {
-          'language': 'Hill Mari',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'hi': {
-          'language': 'Hindi',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'hu': {
-          'language': 'Hungarian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'is': {
-          'language': 'Icelandic',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'id': {
-          'language': 'Indonesian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ga': {
-          'language': 'Irish',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'jv': {
-          'language': 'Javanese',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'kn': {
-          'language': 'Kannada',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'kk': {
-          'language': 'Kazakh',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ky': {
-          'language': 'Kyrgyz',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'la': {
-          'language': 'Latin',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'lv': {
-          'language': 'Latvian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'lt': {
-          'language': 'Lithuanian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'mk': {
-          'language': 'Macedonian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'mg': {
-          'language': 'Malagasy',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ms': {
-          'language': 'Malay',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        // 'ml': {
-        //   'language': 'Malayalam',
-        //   'tier': 2,
-        //   'selected': false,
-        //   'translation': ''
-        // },
-        'mt': {
-          'language': 'Maltese',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'mi': {
-          'language': 'Maori',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'mr': {
-          'language': 'Marathi',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'mhr': {
-          'language': 'Mari',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'mn': {
-          'language': 'Mongolian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ne': {
-          'language': 'Nepali',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'no': {
-          'language': 'Norwegian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'pap': {
-          'language': 'Papiamento',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'fa': {
-          'language': 'Persian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        // 'pa': {
-        //   'language': 'Punjabi',
-        //   'tier': 2,
-        //   'selected': false,
-        //   'translation': ''
-        // },
-        'ro': {
-          'language': 'Romanian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'gd': {
-          'language': 'Scottish Gaelic',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'sr': {
-          'language': 'Serbian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'si': {
-          'language': 'Sinhala',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'sk': {
-          'language': 'Slovakian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'sl': {
-          'language': 'Slovenian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'su': {
-          'language': 'Sundanese',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'sw': {
-          'language': 'Swahili',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'sv': {
-          'language': 'Swedish',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'tl': {
-          'language': 'Tagalog',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'tg': {
-          'language': 'Tajik',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ta': {
-          'language': 'Tamil',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'tt': {
-          'language': 'Tatar',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'te': {
-          'language': 'Telugu',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'udm': {
-          'language': 'Udmurt',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'uk': {
-          'language': 'Ukrainian',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'ur': {
-          'language': 'Urdu',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'uz': {
-          'language': 'Uzbek',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'cy': {
-          'language': 'Welsh',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'xh': {
-          'language': 'Xhosa',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        },
-        'yi': {
-          'language': 'Yiddish',
-          'tier': 2,
-          'selected': false,
-          'translation': ''
-        }
+      supportedLanguages: {
+        "nl": "Dutch",
+        "en": "English",
+        "fr": "French",
+        "de": "German",
+        "it": "Italian",
+        "pl": "Polish",
+        "pt": "Portuguese",
+        "ru": "Russian",
+        "es": "Spanish",
+        "tr": "Turkish",
+        "vi": "Vietnamese",
+        "ar": "Arabic",
+        "zh": "Chinese",
+        "ja": "Japanese",
+        "ko": "Korean",
+        "th": "Thai",
+        "af": "Afrikaans",
+        "sq": "Albanian",
+        // "am": "Amharic",
+        "hy": "Armenian",
+        "az": "Azerbaijan",
+        "ba": "Bashkir",
+        "eu": "Basque",
+        "be": "Belarusian",
+        "bn": "Bengali",
+        "bs": "Bosnian",
+        "bg": "Bulgarian",
+        "ca": "Catalan",
+        "ceb": "Cebuano",
+        "hr": "Croatian",
+        "cs": "Czech",
+        "da": "Danish",
+        "eo": "Esperanto",
+        "et": "Estonian",
+        "fi": "Finnish",
+        "gl": "Galician",
+        "ka": "Georgian",
+        "el": "Greek",
+        "gu": "Gujarati",
+        "ht": "Haitian (Creole)",
+        "he": "Hebrew",
+        "mrj": "Hill Mari",
+        "hi": "Hindi",
+        "hu": "Hungarian",
+        "is": "Icelandic",
+        "id": "Indonesian",
+        "ga": "Irish",
+        "jv": "Javanese",
+        "kn": "Kannada",
+        "kk": "Kazakh",
+        "ky": "Kyrgyz",
+        "la": "Latin",
+        "lv": "Latvian",
+        "lt": "Lithuanian",
+        "mk": "Macedonian",
+        "mg": "Malagasy",
+        "ms": "Malay",
+        // "ml": "Malayalam",
+        "mt": "Maltese",
+        "mi": "Maori",
+        "mr": "Marathi",
+        "mhr": "Mari",
+        "mn": "Mongolian",
+        "ne": "Nepali",
+        "no": "Norwegian",
+        "pap": "Papiamento",
+        "fa": "Persian",
+        // "pa": "Punjabi",
+        "ro": "Romanian",
+        "gd": "Scottish Gaelic",
+        "sr": "Serbian",
+        "si": "Sinhala",
+        "sk": "Slovakian",
+        "sl": "Slovenian",
+        "su": "Sundanese",
+        "sw": "Swahili",
+        "sv": "Swedish",
+        "tl": "Tagalog",
+        "tg": "Tajik",
+        "ta": "Tamil",
+        "tt": "Tatar",
+        "te": "Telugu",
+        "udm": "Udmurt",
+        "uk": "Ukrainian",
+        "ur": "Urdu",
+        "uz": "Uzbek",
+        "cy": "Welsh",
+        "xh": "Xhosa",
+        "yi": "Yiddish"
       },
-      selected: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
+      selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
       word: '',
       isLoading: false,
       output: [],
@@ -769,7 +329,6 @@ export default {
     }
   },
   methods: {
-    // https://vuejs.org/v2/guide/computed.html
     translate: _.debounce(
       function() {
         if (this.word == '') {
@@ -780,32 +339,42 @@ export default {
         } else {
           // clear the output
           this.output = [];
+          //this.isLoading = true;
 
-          // get the word to translate
-          var self = this,
-              text = this.word;
-
-          // translate and add to object
-          _.forIn(this.languages, function(value, key) {
-            var code = [key][0],
-                language = value.language;
-
-            if (value.selected === true) {
-              self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
-              .then(function(response) {
-                self.output.push({
-                  language: language,
-                  code: code,
-                  translation: response.data.text[0],
-                  characterCount: response.data.text[0].length
-                });
-              }, function(response) {
-                //console.log('Error');
+          var self = this;
+          var getTranslation = function(i, code, lang) {
+            var text = self.word;
+            self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
+            .then(function(response) {
+              self.output.push({
+                characterCount: response.data.text[0].length,
+                code: code,
+                lang: lang,
+                translation: response.data.text[0]
               });
-            }
-          });
+              if (i < self.selectedLanguages.length - 1) {
+                self.isLoading = true;
+                console.log('true');
+              }
+              if (i === self.selectedLanguages.length - 1) {
+                self.isLoading = false;
+                console.log('false');
+              }
+            }, function(response) {
+              console.log('ERROR!!!!!!!');
+            });
+          }
+
+          // for each code in selectedLanguages array, build output object
+          for (var i = 0; i < self.selectedLanguages.length; i++) {
+            var code = self.selectedLanguages[i],
+                lang = self.supportedLanguages[code];
+            getTranslation(i, code, lang);
+            console.log(i, self.selectedLanguages.length - 1);
+          }
           this.hasOutput = true;
-          //console.log(this.output);
+          //this.isLoading = false;
+          console.log(this.output);
         }
       }, 500),
     selectInputs: function(which) {
@@ -824,7 +393,15 @@ export default {
         });
       }
       this.translate();
+    },
+    selectText: function(e) {
+      console.log(e.target.value);
+      e.target.value.select();
     }
   }
 }
+
+// TODO create separate array/object for selected languages, so i dont have to loop through them all
+//
+
 </script>
