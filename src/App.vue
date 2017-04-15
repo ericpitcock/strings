@@ -91,12 +91,15 @@
     height: 60px;
     border: none;
     padding-left: 30px;
+    line-height: 60px;
     @include block();
+    transition: all .2s ease-in-out;
     &::placeholder {
       color: black;
     }
     &:focus {
       outline: none;
+      background: lighten(yellow, 45%);
     }
   }
 
@@ -106,7 +109,6 @@
     right: 30px;
     bottom: 30px;
     left: 260px;
-    width: 100%;
     max-width: 700px;
     overflow: scroll;
     @include block();
@@ -332,16 +334,13 @@ export default {
     translate: _.debounce(
       function() {
         if (this.word == '') {
-          // clear the output
           this.output = [];
           this.hasOutput = false;
-          //console.log('the input is empty');
         } else {
-          // clear the output
           this.output = [];
-          //this.isLoading = true;
 
           var self = this;
+
           var getTranslation = function(i, code, lang) {
             self.isLoading = true;
             var text = self.word;
@@ -353,29 +352,22 @@ export default {
                 lang: lang,
                 translation: response.data.text[0]
               });
-              // if (i < self.selectedLanguages.length - 1) {
-              //   self.isLoading = true;
-              //   console.log('true');
-              // }
               if (i === self.selectedLanguages.length - 1) {
                 self.isLoading = false;
-                console.log('false');
+                //console.log('false');
               }
             }, function(response) {
               console.log('ERROR!!!!!!!');
             });
           }
 
-          // for each code in selectedLanguages array, build output object
+          // for each code in selectedLanguages array
           for (var i = 0; i < self.selectedLanguages.length; i++) {
             var code = self.selectedLanguages[i],
                 lang = self.supportedLanguages[code];
             getTranslation(i, code, lang);
-            //console.log(i, self.selectedLanguages.length - 1);
           }
           this.hasOutput = true;
-          //this.isLoading = false;
-          console.log(this.output);
         }
       }, 1000),
     selectInputs: function(which) {
@@ -392,12 +384,7 @@ export default {
     },
     selectText: function(e) {
       console.log(e.target.value);
-      e.target.value.select();
     }
   }
 }
-
-// TODO create separate array/object for selected languages, so i dont have to loop through them all
-//
-
 </script>
