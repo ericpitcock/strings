@@ -62,7 +62,7 @@
       display: block;
       margin-bottom: 10px;
       &:hover {
-        color: red;
+        //color: red;
       }
       input {
         margin-right: 5px;
@@ -343,6 +343,7 @@ export default {
 
           var self = this;
           var getTranslation = function(i, code, lang) {
+            self.isLoading = true;
             var text = self.word;
             self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
             .then(function(response) {
@@ -352,10 +353,10 @@ export default {
                 lang: lang,
                 translation: response.data.text[0]
               });
-              if (i < self.selectedLanguages.length - 1) {
-                self.isLoading = true;
-                console.log('true');
-              }
+              // if (i < self.selectedLanguages.length - 1) {
+              //   self.isLoading = true;
+              //   console.log('true');
+              // }
               if (i === self.selectedLanguages.length - 1) {
                 self.isLoading = false;
                 console.log('false');
@@ -370,13 +371,13 @@ export default {
             var code = self.selectedLanguages[i],
                 lang = self.supportedLanguages[code];
             getTranslation(i, code, lang);
-            console.log(i, self.selectedLanguages.length - 1);
+            //console.log(i, self.selectedLanguages.length - 1);
           }
           this.hasOutput = true;
           //this.isLoading = false;
           console.log(this.output);
         }
-      }, 500),
+      }, 1000),
     selectInputs: function(which) {
       var self = this;
       if (which == "all") {
