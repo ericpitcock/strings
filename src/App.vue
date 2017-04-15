@@ -82,24 +82,40 @@
     }
   }
 
-  input.word-input {
+  .input-container {
     position: absolute;
     top: 60px;
     left: 260px;
     width: 100%;
     max-width: 450px;
     height: 60px;
-    border: none;
-    padding-left: 30px;
-    line-height: 60px;
-    @include block();
-    transition: all .2s ease-in-out;
-    &::placeholder {
-      color: black;
+    input.word-input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding-left: 30px;
+      line-height: 60px;
+      @include block();
+      transition: all .2s ease-in-out;
+      &::placeholder {
+        color: black;
+      }
+      &:focus {
+        outline: none;
+        background: lighten(yellow, 45%);
+      }
     }
-    &:focus {
-      outline: none;
-      background: lighten(yellow, 45%);
+    .clear-input {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 56px;
+      text-align: center;
+      color: #ccc;
     }
   }
 
@@ -188,7 +204,10 @@
         <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages" @change="translate">{{ language }}
       </label>
     </div>
+    <div class="input-container">
     <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
+    <div @click="clearInput" class="clear-input">×</div>
+    </div>
     <div class="translation-cont">
       <div class="loading" v-show="isLoading"><img src="static/img/loading.svg" /></div>
       <table class="output">
@@ -200,7 +219,7 @@
           </tr>
         </thead>
         <transition name="fade">
-        <tbody v-if="hasOutput">
+        <tbody v-if="output">
         <tr v-for="item in sortOutput" v-model="sortOutput">
           <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
           <td><span v-bind:class="item.code"><input @click="selectText" class="translation" type="text" v-bind:value="item.translation" readonly></span></td>
@@ -384,6 +403,9 @@ export default {
     },
     selectText: function(e) {
       console.log(e.target.value);
+    },
+    clearInput: function() {
+      this.word = '';
     }
   }
 }
