@@ -11,6 +11,8 @@
     }
   }
 
+  $light-gray: #e6e6e6;
+
   html { overflow: hidden; }
 
   body, input, textarea {
@@ -48,18 +50,36 @@
     background: url('http://www.ericpitcock.com/assets/img/e.svg') left center no-repeat;
   }
 
-  .language-list {
+  .select-control {
     position: absolute;
     top: 60px;
+    left: 30px;
+    width: 200px;
+    height: 30px;
+    @include block();
+    border-bottom-color: $light-gray;
+    box-shadow: none;
+    padding-left: 30px;
+    z-index: 2;
+    button {
+      border: 1px solid $light-gray;
+      background: none;
+      font-size: 10px;
+      color: red;
+      letter-spacing: 1px;
+    }
+  }
+
+  .languages {
+    position: absolute;
+    top: 90px;
     bottom: 30px;
     left: 30px;
     width: 200px;
     overflow: scroll;
-    padding: 30px;
+    padding: 20px 30px 30px 30px;
     @include block();
-    .select-control {
-      margin-bottom: 20px;
-    }
+    border-top: none;
     label {
       display: block;
       margin-bottom: 10px;
@@ -79,7 +99,7 @@
     }
     .th {
       padding-bottom: 20px;
-      border-bottom: 1px solid #f2f2f2;
+      border-bottom: 1px solid $light-gray;
       margin-bottom: 20px;
     }
   }
@@ -104,7 +124,7 @@
       }
       &:focus {
         outline: none;
-        background: lighten(yellow, 45%);
+        border-color: #999;
       }
     }
     .clear-input {
@@ -147,7 +167,7 @@
         letter-spacing: 1px;
         color: red;
         tr {
-          border-bottom: 1px solid #e6e6e6;
+          border-bottom: 1px solid $light-gray;
         }
         th {
           width: 33.333%;
@@ -156,7 +176,7 @@
       }
       tbody {
         tr {
-          border-bottom: 1px solid #e6e6e6;
+          border-bottom: 1px solid $light-gray;
           &:nth-child(odd) {
             background: #f9f9f9;
           }
@@ -203,14 +223,14 @@
 <template>
   <div id="app">
     <h1>Translate</h1>
-    <div class="language-list small">
-      <div class="select-control">Select: <button @click="selectInputs('all')" class="select-all" type="button" name="button">All</button> <button @click="selectInputs('none')" class="select-none" type="button" name="button">None</button></div>
+    <div class="select-control"><button @click="selectInputs('all')" class="select-all" type="button" name="button">ALL</button> <button @click="selectInputs('none')" class="select-none" type="button" name="button">NONE</button></div>
+    <div class="languages small">
       <label v-for="(language, index) in supportedLanguages" v-bind:class="index">
         <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages" @change="translate">{{ language }}
       </label>
     </div>
     <div class="input-container">
-    <input @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
+    <input ref="butt" @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
     <div @click="clearInput" class="clear-input">×</div>
     </div>
     <div class="translation-cont">
@@ -355,6 +375,9 @@ export default {
     }
   },
   methods: {
+    init: function() {
+      this.$refs.butt.focus();
+    },
     translate: _.debounce(
       function() {
         if (this.word == '') {
@@ -412,6 +435,12 @@ export default {
     clearInput: function() {
       this.word = '';
     }
+  },
+  mounted() {
+    this.init();
   }
 }
+
+//TODO make a table with every language and show if has translation, hide if nah
+
 </script>
