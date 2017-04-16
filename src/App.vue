@@ -11,6 +11,8 @@
     }
   }
 
+  html { overflow: hidden; }
+
   body, input, textarea {
     font-family: 'Noto Sans', sans-serif;
     font-size: 14px;
@@ -261,7 +263,7 @@ export default {
         "th": "Thai",
         "af": "Afrikaans",
         "sq": "Albanian",
-        // "am": "Amharic",
+        "am": "Amharic",
         "hy": "Armenian",
         "az": "Azerbaijan",
         "ba": "Bashkir",
@@ -300,7 +302,7 @@ export default {
         "mk": "Macedonian",
         "mg": "Malagasy",
         "ms": "Malay",
-        // "ml": "Malayalam",
+        "ml": "Malayalam",
         "mt": "Maltese",
         "mi": "Maori",
         "mr": "Marathi",
@@ -310,7 +312,7 @@ export default {
         "no": "Norwegian",
         "pap": "Papiamento",
         "fa": "Persian",
-        // "pa": "Punjabi",
+        "pa": "Punjabi",
         "ro": "Romanian",
         "gd": "Scottish Gaelic",
         "sr": "Serbian",
