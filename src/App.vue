@@ -226,7 +226,7 @@
     <div class="select-control"><button @click="selectInputs('all')" class="select-all" type="button" name="button">ALL</button> <button @click="selectInputs('none')" class="select-none" type="button" name="button">NONE</button></div>
     <div class="languages small">
       <label v-for="(language, index) in supportedLanguages" v-bind:class="index">
-        <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages" @change="translate">{{ language }}
+        <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages" @change="translate">{{ language.language }}
       </label>
     </div>
     <div class="input-container">
@@ -245,10 +245,10 @@
         </thead>
         <transition name="fade">
         <tbody v-if="output">
-        <tr v-for="item in sortOutput" v-model="sortOutput">
-          <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
-          <td><input @click="selectText" v-bind:class="item.code" class="translation" type="text" v-bind:value="item.translation" readonly></td>
-          <td>{{ item.characterCount }}</td>
+        <tr v-bind:class="index" v-for="(language, index) in supportedLanguages" v-if="selectedLanguages.includes(index) && supportedLanguages[index].translation">
+          <td>{{ language.language }}<span class="lang-label">{{ index }}</span></td>
+          <td><input @click="selectText" v-bind:class="index" class="translation" type="text" v-bind:value="language.translation" readonly></td>
+          <td>3</td>
         </tr>
         </tbody>
         </transition>
@@ -265,95 +265,451 @@ export default {
   data() {
     return {
       supportedLanguages: {
-        "nl": "Dutch",
-        "en": "English",
-        "fr": "French",
-        "de": "German",
-        "it": "Italian",
-        "pl": "Polish",
-        "pt": "Portuguese",
-        "ru": "Russian",
-        "es": "Spanish",
-        "tr": "Turkish",
-        "vi": "Vietnamese",
-        "ar": "Arabic",
-        "zh": "Chinese",
-        "ja": "Japanese",
-        "ko": "Korean",
-        "th": "Thai",
-        "af": "Afrikaans",
-        "sq": "Albanian",
-        "am": "Amharic",
-        "hy": "Armenian",
-        "az": "Azerbaijan",
-        "ba": "Bashkir",
-        "eu": "Basque",
-        "be": "Belarusian",
-        "bn": "Bengali",
-        "bs": "Bosnian",
-        "bg": "Bulgarian",
-        "ca": "Catalan",
-        "ceb": "Cebuano",
-        "hr": "Croatian",
-        "cs": "Czech",
-        "da": "Danish",
-        "eo": "Esperanto",
-        "et": "Estonian",
-        "fi": "Finnish",
-        "gl": "Galician",
-        "ka": "Georgian",
-        "el": "Greek",
-        "gu": "Gujarati",
-        "ht": "Haitian (Creole)",
-        "he": "Hebrew",
-        "mrj": "Hill Mari",
-        "hi": "Hindi",
-        "hu": "Hungarian",
-        "is": "Icelandic",
-        "id": "Indonesian",
-        "ga": "Irish",
-        "jv": "Javanese",
-        "kn": "Kannada",
-        "kk": "Kazakh",
-        "ky": "Kyrgyz",
-        "la": "Latin",
-        "lv": "Latvian",
-        "lt": "Lithuanian",
-        "mk": "Macedonian",
-        "mg": "Malagasy",
-        "ms": "Malay",
-        "ml": "Malayalam",
-        "mt": "Maltese",
-        "mi": "Maori",
-        "mr": "Marathi",
-        "mhr": "Mari",
-        "mn": "Mongolian",
-        "ne": "Nepali",
-        "no": "Norwegian",
-        "pap": "Papiamento",
-        "fa": "Persian",
-        "pa": "Punjabi",
-        "ro": "Romanian",
-        "gd": "Scottish Gaelic",
-        "sr": "Serbian",
-        "si": "Sinhala",
-        "sk": "Slovakian",
-        "sl": "Slovenian",
-        "su": "Sundanese",
-        "sw": "Swahili",
-        "sv": "Swedish",
-        "tl": "Tagalog",
-        "tg": "Tajik",
-        "ta": "Tamil",
-        "tt": "Tatar",
-        "te": "Telugu",
-        "udm": "Udmurt",
-        "uk": "Ukrainian",
-        "ur": "Urdu",
-        "uz": "Uzbek",
-        "cy": "Welsh",
-        "xh": "Xhosa",
-        "yi": "Yiddish"
+        'nl': {
+          'language': 'Dutch',
+          'selected': true,
+          'translation': ''
+        },
+        'en': {
+          'language': 'English',
+          'selected': true,
+          'translation': ''
+        },
+        'fr': {
+          'language': 'French',
+          'selected': true,
+          'translation': ''
+        },
+        'de': {
+          'language': 'German',
+          'selected': true,
+          'translation': ''
+        },
+        'it': {
+          'language': 'Italian',
+          'selected': true,
+          'translation': ''
+        },
+        'pl': {
+          'language': 'Polish',
+          'selected': true,
+          'translation': ''
+        },
+        'pt': {
+          'language': 'Portuguese',
+          'selected': true,
+          'translation': ''
+        },
+        'ru': {
+          'language': 'Russian',
+          'selected': true,
+          'translation': ''
+        },
+        'es': {
+          'language': 'Spanish',
+          'selected': true,
+          'translation': ''
+        },
+        'tr': {
+          'language': 'Turkish',
+          'selected': true,
+          'translation': ''
+        },
+        'vi': {
+          'language': 'Vietnamese',
+          'selected': true,
+          'translation': ''
+        },
+        'ar': {
+          'language': 'Arabic',
+          'selected': true,
+          'translation': ''
+        },
+        'zh': {
+          'language': 'Chinese',
+          'selected': true,
+          'translation': ''
+        },
+        'ja': {
+          'language': 'Japanese',
+          'selected': true,
+          'translation': ''
+        },
+        'ko': {
+          'language': 'Korean',
+          'selected': true,
+          'translation': ''
+        },
+        'th': {
+          'language': 'Thai',
+          'selected': true,
+          'translation': ''
+        },
+        'af': {
+          'language': 'Afrikaans',
+          'selected': false,
+          'translation': ''
+        },
+        'sq': {
+          'language': 'Albanian',
+          'selected': false,
+          'translation': ''
+        },
+        'am': {
+          'language': 'Amharic',
+          'selected': false,
+          'translation': ''
+        },
+        'hy': {
+          'language': 'Armenian',
+          'selected': false,
+          'translation': ''
+        },
+        'az': {
+          'language': 'Azerbaijan',
+          'selected': false,
+          'translation': ''
+        },
+        'ba': {
+          'language': 'Bashkir',
+          'selected': false,
+          'translation': ''
+        },
+        'eu': {
+          'language': 'Basque',
+          'selected': false,
+          'translation': ''
+        },
+        'be': {
+          'language': 'Belarusian',
+          'selected': false,
+          'translation': ''
+        },
+        'bn': {
+          'language': 'Bengali',
+          'selected': false,
+          'translation': ''
+        },
+        'bs': {
+          'language': 'Bosnian',
+          'selected': false,
+          'translation': ''
+        },
+        'bg': {
+          'language': 'Bulgarian',
+          'selected': false,
+          'translation': ''
+        },
+        'ca': {
+          'language': 'Catalan',
+          'selected': false,
+          'translation': ''
+        },
+        'ceb': {
+          'language': 'Cebuano',
+          'selected': false,
+          'translation': ''
+        },
+        'hr': {
+          'language': 'Croatian',
+          'selected': false,
+          'translation': ''
+        },
+        'cs': {
+          'language': 'Czech',
+          'selected': false,
+          'translation': ''
+        },
+        'da': {
+          'language': 'Danish',
+          'selected': false,
+          'translation': ''
+        },
+        'eo': {
+          'language': 'Esperanto',
+          'selected': false,
+          'translation': ''
+        },
+        'et': {
+          'language': 'Estonian',
+          'selected': false,
+          'translation': ''
+        },
+        'fi': {
+          'language': 'Finnish',
+          'selected': false,
+          'translation': ''
+        },
+        'gl': {
+          'language': 'Galician',
+          'selected': false,
+          'translation': ''
+        },
+        'ka': {
+          'language': 'Georgian',
+          'selected': false,
+          'translation': ''
+        },
+        'el': {
+          'language': 'Greek',
+          'selected': false,
+          'translation': ''
+        },
+        'gu': {
+          'language': 'Gujarati',
+          'selected': false,
+          'translation': ''
+        },
+        'ht': {
+          'language': 'Haitian (Creole)',
+          'selected': false,
+          'translation': ''
+        },
+        'he': {
+          'language': 'Hebrew',
+          'selected': false,
+          'translation': ''
+        },
+        'mrj': {
+          'language': 'Hill Mari',
+          'selected': false,
+          'translation': ''
+        },
+        'hi': {
+          'language': 'Hindi',
+          'selected': false,
+          'translation': ''
+        },
+        'hu': {
+          'language': 'Hungarian',
+          'selected': false,
+          'translation': ''
+        },
+        'is': {
+          'language': 'Icelandic',
+          'selected': false,
+          'translation': ''
+        },
+        'id': {
+          'language': 'Indonesian',
+          'selected': false,
+          'translation': ''
+        },
+        'ga': {
+          'language': 'Irish',
+          'selected': false,
+          'translation': ''
+        },
+        'jv': {
+          'language': 'Javanese',
+          'selected': false,
+          'translation': ''
+        },
+        'kn': {
+          'language': 'Kannada',
+          'selected': false,
+          'translation': ''
+        },
+        'kk': {
+          'language': 'Kazakh',
+          'selected': false,
+          'translation': ''
+        },
+        'ky': {
+          'language': 'Kyrgyz',
+          'selected': false,
+          'translation': ''
+        },
+        'la': {
+          'language': 'Latin',
+          'selected': false,
+          'translation': ''
+        },
+        'lv': {
+          'language': 'Latvian',
+          'selected': false,
+          'translation': ''
+        },
+        'lt': {
+          'language': 'Lithuanian',
+          'selected': false,
+          'translation': ''
+        },
+        'mk': {
+          'language': 'Macedonian',
+          'selected': false,
+          'translation': ''
+        },
+        'mg': {
+          'language': 'Malagasy',
+          'selected': false,
+          'translation': ''
+        },
+        'ms': {
+          'language': 'Malay',
+          'selected': false,
+          'translation': ''
+        },
+        'ml': {
+          'language': 'Malayalam',
+          'selected': false,
+          'translation': ''
+        },
+        'mt': {
+          'language': 'Maltese',
+          'selected': false,
+          'translation': ''
+        },
+        'mi': {
+          'language': 'Maori',
+          'selected': false,
+          'translation': ''
+        },
+        'mr': {
+          'language': 'Marathi',
+          'selected': false,
+          'translation': ''
+        },
+        'mhr': {
+          'language': 'Mari',
+          'selected': false,
+          'translation': ''
+        },
+        'mn': {
+          'language': 'Mongolian',
+          'selected': false,
+          'translation': ''
+        },
+        'ne': {
+          'language': 'Nepali',
+          'selected': false,
+          'translation': ''
+        },
+        'no': {
+          'language': 'Norwegian',
+          'selected': false,
+          'translation': ''
+        },
+        'pap': {
+          'language': 'Papiamento',
+          'selected': false,
+          'translation': ''
+        },
+        'fa': {
+          'language': 'Persian',
+          'selected': false,
+          'translation': ''
+        },
+        'pa': {
+          'language': 'Punjabi',
+          'selected': false,
+          'translation': ''
+        },
+        'ro': {
+          'language': 'Romanian',
+          'selected': false,
+          'translation': ''
+        },
+        'gd': {
+          'language': 'Scottish Gaelic',
+          'selected': false,
+          'translation': ''
+        },
+        'sr': {
+          'language': 'Serbian',
+          'selected': false,
+          'translation': ''
+        },
+        'si': {
+          'language': 'Sinhala',
+          'selected': false,
+          'translation': ''
+        },
+        'sk': {
+          'language': 'Slovakian',
+          'selected': false,
+          'translation': ''
+        },
+        'sl': {
+          'language': 'Slovenian',
+          'selected': false,
+          'translation': ''
+        },
+        'su': {
+          'language': 'Sundanese',
+          'selected': false,
+          'translation': ''
+        },
+        'sw': {
+          'language': 'Swahili',
+          'selected': false,
+          'translation': ''
+        },
+        'sv': {
+          'language': 'Swedish',
+          'selected': false,
+          'translation': ''
+        },
+        'tl': {
+          'language': 'Tagalog',
+          'selected': false,
+          'translation': ''
+        },
+        'tg': {
+          'language': 'Tajik',
+          'selected': false,
+          'translation': ''
+        },
+        'ta': {
+          'language': 'Tamil',
+          'selected': false,
+          'translation': ''
+        },
+        'tt': {
+          'language': 'Tatar',
+          'selected': false,
+          'translation': ''
+        },
+        'te': {
+          'language': 'Telugu',
+          'selected': false,
+          'translation': ''
+        },
+        'udm': {
+          'language': 'Udmurt',
+          'selected': false,
+          'translation': ''
+        },
+        'uk': {
+          'language': 'Ukrainian',
+          'selected': false,
+          'translation': ''
+        },
+        'ur': {
+          'language': 'Urdu',
+          'selected': false,
+          'translation': ''
+        },
+        'uz': {
+          'language': 'Uzbek',
+          'selected': false,
+          'translation': ''
+        },
+        'cy': {
+          'language': 'Welsh',
+          'selected': false,
+          'translation': ''
+        },
+        'xh': {
+          'language': 'Xhosa',
+          'selected': false,
+          'translation': ''
+        },
+        'yi': {
+          'language': 'Yiddish',
+          'selected': false,
+          'translation': ''
+        }
       },
       selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
       word: '',
@@ -388,17 +744,16 @@ export default {
 
           var self = this;
 
-          var getTranslation = function(i, code, lang) {
+          var getTranslation = function(i, code) {
             self.isLoading = true;
             var text = self.word;
             self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
             .then(function(response) {
-              self.output.push({
-                characterCount: response.data.text[0].length,
-                code: code,
-                lang: lang,
-                translation: response.data.text[0]
-              });
+              // self.supportedLanguages[code].push({
+              //   //characterCount: response.data.text[0].length,
+              //   translation: response.data.text[0]
+              // });
+              self.supportedLanguages[code].translation = response.data.text[0];
               if (i === self.selectedLanguages.length - 1) {
                 self.isLoading = false;
                 //console.log('false');
@@ -410,9 +765,10 @@ export default {
 
           // for each code in selectedLanguages array
           for (var i = 0; i < self.selectedLanguages.length; i++) {
-            var code = self.selectedLanguages[i],
-                lang = self.supportedLanguages[code];
-            getTranslation(i, code, lang);
+            var code = self.selectedLanguages[i];
+            //console.log(self.supportedLanguages[self.selectedLanguages[i]]);
+                //lang = self.supportedLanguages[code];
+            getTranslation(i, code);
           }
           this.hasOutput = true;
         }
