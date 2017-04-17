@@ -154,11 +154,6 @@
     overflow: scroll;
     @include block();
     .loading {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-    .loadingg {
       height: 2px;
       position: absolute;
       background: red;
@@ -239,8 +234,7 @@
     <div @click="clearInput" class="clear-input">×</div>
     </div>
     <div class="translation-cont" ref="translationCont">
-      <!-- <div class="loading" v-show="isLoading"><img src="static/img/loading.svg" /></div> -->
-      <div class="loadingg" v-bind:style="{ width: loadinggWidth + 'px' }" ></div>
+      <div class="loading" v-bind:style="{ width: loadingWidth + 'px' }" ></div>
       <table class="output">
         <thead class="small">
           <tr>
@@ -363,7 +357,7 @@ export default {
       word: '',
       output: [],
       isLoading: false,
-      loadinggWidth: 0
+      loadingWidth: 0
     }
   },
   computed: {
@@ -411,12 +405,12 @@ export default {
               });
 
               // loading...
-              self.loadinggWidth += divWidth / steps;
+              self.loadingWidth += divWidth / steps;
 
               if (i === self.selectedLanguages.length - 1) {
                 self.isLoading = false;
                 self.output = tempStore;
-                self.loadinggWidth = 0;
+                self.loadingWidth = 0;
               }
             }, function(response) {
               console.log('ERROR!!!!!!!');
