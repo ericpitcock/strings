@@ -358,18 +358,18 @@ export default {
       selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
       word: '',
       isLoading: false,
-      output: [],
-      hasOutput: false,
-      errorMsg: ''
+      output: []
     }
   },
   computed: {
     sortOutput: function() {
       return _.orderBy(this.output, 'characterCount', 'desc');
-      this.hasOutput = true;
     },
   },
   watch: {
+    // selectedLanguages: function() {
+    //   console.log(this.selectedLanguages);
+    // },
     word: function() {
       this.translate();
     }
@@ -382,26 +382,28 @@ export default {
       function() {
         if (this.word == '') {
           this.output = [];
-          this.hasOutput = false;
         } else {
           this.output = [];
 
-          var self = this;
+          var self = this,
+              tempStore = [];
 
           var getTranslation = function(i, code, lang) {
             self.isLoading = true;
             var text = self.word;
             self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
             .then(function(response) {
-              self.output.push({
+              tempStore.push({
                 characterCount: response.data.text[0].length,
                 code: code,
                 lang: lang,
                 translation: response.data.text[0]
               });
+
               if (i === self.selectedLanguages.length - 1) {
                 self.isLoading = false;
-                //console.log('false');
+                self.output = tempStore;
+                console.log(tempStore);
               }
             }, function(response) {
               console.log('ERROR!!!!!!!');
@@ -414,7 +416,6 @@ export default {
                 lang = self.supportedLanguages[code];
             getTranslation(i, code, lang);
           }
-          this.hasOutput = true;
         }
       }, 1000),
     selectInputs: function(which) {
@@ -440,7 +441,4 @@ export default {
     this.init();
   }
 }
-
-//TODO make a table with every language and show if has translation, hide if nah
-
 </script>
