@@ -223,14 +223,14 @@
 <template>
   <div id="app">
     <h1>Translate</h1>
-    <div class="select-control"><button @click="selectInputs('all')" class="select-all" type="button" name="button">ALL</button> <button @click="selectInputs('none')" class="select-none" type="button" name="button">NONE</button></div>
+    <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">ALL</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">NONE</button></div>
     <div class="languages small">
       <label v-for="(language, index) in supportedLanguages" v-bind:class="index">
         <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages" @change="translate">{{ language }}
       </label>
     </div>
     <div class="input-container">
-    <input ref="butt" @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
+    <input ref="input" @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
     <div @click="clearInput" class="clear-input">×</div>
     </div>
     <div class="translation-cont">
@@ -357,26 +357,29 @@ export default {
       },
       selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
       word: '',
-      isLoading: false,
-      output: []
+      output: [],
+      isLoading: false
     }
   },
   computed: {
     sortOutput: function() {
-      return _.orderBy(this.output, 'characterCount', 'desc');
+      //return _.orderBy(this.output, 'characterCount', 'desc');
+      return this.output.sort(function(a, b) {
+        return b.characterCount - a.characterCount;
+      });
     },
   },
   watch: {
-    // selectedLanguages: function() {
-    //   console.log(this.selectedLanguages);
-    // },
+    selectedLanguages: function() {
+      // if just removing, don't re-translate
+    },
     word: function() {
       this.translate();
     }
   },
   methods: {
     init: function() {
-      this.$refs.butt.focus();
+      this.$refs.input.focus();
     },
     translate: _.debounce(
       function() {
@@ -388,7 +391,7 @@ export default {
           var self = this,
               tempStore = [];
 
-          var getTranslation = function(i, code, lang) {
+          var getTranslation = function(i, code) {
             self.isLoading = true;
             var text = self.word;
             self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
@@ -396,37 +399,38 @@ export default {
               tempStore.push({
                 characterCount: response.data.text[0].length,
                 code: code,
-                lang: lang,
+                lang: self.supportedLanguages[code],
                 translation: response.data.text[0]
               });
 
               if (i === self.selectedLanguages.length - 1) {
                 self.isLoading = false;
                 self.output = tempStore;
-                console.log(tempStore);
               }
             }, function(response) {
               console.log('ERROR!!!!!!!');
             });
           }
 
-          // for each code in selectedLanguages array
+          // translate for each code in selectedLanguages array
           for (var i = 0; i < self.selectedLanguages.length; i++) {
-            var code = self.selectedLanguages[i],
-                lang = self.supportedLanguages[code];
-            getTranslation(i, code, lang);
+            getTranslation(i, self.selectedLanguages[i]);
           }
         }
       }, 1000),
-    selectInputs: function(which) {
-      var self = this;
-      if (which == "all") {
-        _.forEach(this.supportedLanguages, function(key, value) {
-          var code = value;
-          self.selectedLanguages.push(code);
-        });
-      } else {
-        this.selectedLanguages = [];
+    selectLanguages: function(which) {
+      //var self = this;
+      this.selectedLanguages = [];
+      this.output = [];
+      if (which == 'all') {
+        // _.forEach(this.supportedLanguages, function(key, value) {
+        //   self.selectedLanguages.push(value);
+        // });
+        for (var lang in this.supportedLanguages) {
+          if (this.supportedLanguages.hasOwnProperty(lang)) {
+            this.selectedLanguages.push(lang);
+          }
+        }
       }
       this.translate();
     },
@@ -435,6 +439,7 @@ export default {
     },
     clearInput: function() {
       this.word = '';
+      this.output = [];
     }
   },
   mounted() {
