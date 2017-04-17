@@ -158,6 +158,11 @@
       top: 10px;
       right: 10px;
     }
+    .loadingg {
+      height: 2px;
+      position: absolute;
+      background: red;
+    }
     table.output {
       width: 100%;
       margin: 30px 0;
@@ -230,11 +235,12 @@
       </label>
     </div>
     <div class="input-container">
-    <input ref="input" @keyup.enter="translate" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
+    <input ref="input" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
     <div @click="clearInput" class="clear-input">×</div>
     </div>
-    <div class="translation-cont">
-      <div class="loading" v-show="isLoading"><img src="static/img/loading.svg" /></div>
+    <div class="translation-cont" ref="translationCont">
+      <!-- <div class="loading" v-show="isLoading"><img src="static/img/loading.svg" /></div> -->
+      <div class="loadingg" v-bind:style="{ width: loadinggWidth + 'px' }" ></div>
       <table class="output">
         <thead class="small">
           <tr>
@@ -244,7 +250,7 @@
           </tr>
         </thead>
         <tbody>
-        <tr v-for="item in sortOutput" v-model="sortOutput">
+        <tr v-for="item in sortOutput">
           <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
           <td><input @click="selectText" v-bind:class="item.code" class="translation" type="text" v-bind:value="item.translation" readonly></td>
           <td>{{ item.characterCount }}</td>
@@ -356,7 +362,8 @@ export default {
       selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
       word: '',
       output: [],
-      isLoading: false
+      isLoading: false,
+      loadinggWidth: 0
     }
   },
   computed: {
@@ -388,6 +395,8 @@ export default {
 
           var self = this,
               tempStore = [];
+              var divWidth = self.$refs.translationCont.clientWidth,
+                  steps = self.selectedLanguages.length;
 
           var getTranslation = function(i, code) {
             self.isLoading = true;
@@ -401,9 +410,13 @@ export default {
                 translation: response.data.text[0]
               });
 
+              // loading...
+              self.loadinggWidth += divWidth / steps;
+
               if (i === self.selectedLanguages.length - 1) {
                 self.isLoading = false;
                 self.output = tempStore;
+                self.loadinggWidth = 0;
               }
             }, function(response) {
               console.log('ERROR!!!!!!!');
