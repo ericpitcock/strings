@@ -243,15 +243,13 @@
             <th>Characters</th>
           </tr>
         </thead>
-        <transition name="fade">
-        <tbody v-if="output">
+        <tbody>
         <tr v-for="item in sortOutput" v-model="sortOutput">
           <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
           <td><input @click="selectText" v-bind:class="item.code" class="translation" type="text" v-bind:value="item.translation" readonly></td>
           <td>{{ item.characterCount }}</td>
         </tr>
         </tbody>
-        </transition>
       </table>
     </div>
   </div>
