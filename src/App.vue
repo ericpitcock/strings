@@ -20,7 +20,7 @@
     font-size: 14px;
     font-weight: 400;
     line-height: 1;
-    background: #f6f6f6;
+    background: #eaeaec;
     color: black;
   }
 
@@ -52,39 +52,42 @@
 
   .select-control {
     position: absolute;
-    top: 60px;
-    left: 30px;
+    top: 67px;
+    left: 20px;
+    text-align: right;
     width: 200px;
-    height: 30px;
-    @include block();
-    border-bottom-color: $light-gray;
-    box-shadow: none;
-    padding-left: 30px;
-    z-index: 2;
+    z-index: 1;
     button {
-      border: 1px solid $light-gray;
+      border: none;
       background: none;
       font-size: 10px;
+      padding: 0;
+      margin-left: 5px;
       color: red;
+      text-transform: uppercase;
       letter-spacing: 1px;
+      &:hover {
+        color: black;
+      }
+      &:focus {
+        outline: none;
+      }
     }
   }
 
   .languages {
     position: absolute;
-    top: 90px;
+    top: 60px;
     bottom: 30px;
     left: 30px;
     width: 200px;
     overflow: scroll;
-    padding: 20px 30px 30px 30px;
+    padding: 26px 30px 30px 30px;
     @include block();
-    border-top: none;
     label {
       display: block;
       margin-bottom: 10px;
       &:hover {
-        //color: red;
       }
       input {
         margin-right: 5px;
@@ -119,12 +122,14 @@
       line-height: 60px;
       @include block();
       transition: all .2s ease-in-out;
+      -webkit-appearance: none;
       &::placeholder {
         color: black;
       }
       &:focus {
         outline: none;
         border-color: #999;
+        box-shadow: 0px 6px 15px rgba(0,0,0,.1);
       }
     }
     .clear-input {
@@ -165,7 +170,7 @@
       thead {
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: red;
+        color: blue;
         tr {
           border-bottom: 1px solid $light-gray;
         }
@@ -223,7 +228,7 @@
 <template>
   <div id="app">
     <h1>Translate</h1>
-    <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">ALL</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">NONE</button></div>
+    <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
     <div class="languages small">
       <label v-for="(language, index) in supportedLanguages" v-bind:class="index">
         <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages" @change="translate">{{ language }}
