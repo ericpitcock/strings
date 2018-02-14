@@ -1,3 +1,147 @@
+<template>
+  <div id="app">
+    <h1>Translate</h1>
+    <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
+    <div class="languages small">
+      <label v-for="(language, index) in supportedLanguages" :class="index">
+        <input class="language" type="checkbox" :value="index" v-model="selectedLanguages" @change="translate">{{ language }}
+      </label>
+    </div>
+    <div class="input-container">
+      <input ref="input" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
+      <div @click="clearInput" class="clear-input">×</div>
+    </div>
+    <div class="translation-cont" ref="translationCont">
+      <div class="loading" :style="{ width: loadingWidth + 'px' }" ></div>
+      <table class="output">
+        <thead class="small">
+          <tr>
+            <th>Language</th>
+            <th>Translation</th>
+            <th>Characters</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in sortOutput">
+          <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
+          <td><input @click="selectText" :class="item.code" class="translation" type="text" :value="item.translation" readonly></td>
+          <td>{{ item.characterCount }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<script>
+  import _ from 'lodash'
+  import supportedLanguages from '../static/languages.json'
+
+  export default {
+    name: 'app',
+    data() {
+      return {
+        supportedLanguages,
+        selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
+        word: '',
+        output: [],
+        isLoading: false,
+        loadingWidth: 0
+      }
+    },
+    computed: {
+      sortOutput: function() {
+        //return _.orderBy(this.output, 'characterCount', 'desc');
+        return this.output.sort(function(a, b) {
+          return b.characterCount - a.characterCount
+        });
+      },
+    },
+    watch: {
+      selectedLanguages: function() {
+        // if just removing, don't re-translate
+      },
+      word: function() {
+        this.translate()
+      }
+    },
+    methods: {
+      init: function() {
+        this.$refs.input.focus()
+      },
+      translate: _.debounce(
+        function() {
+          if (this.word == '') {
+            this.output = []
+          } else {
+            this.output = []
+
+            var self = this,
+                tempStore = [];
+                var divWidth = self.$refs.translationCont.clientWidth,
+                    steps = self.selectedLanguages.length
+
+            var getTranslation = function(i, code) {
+              self.isLoading = true
+              var text = self.word
+              self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
+              .then(function(response) {
+                tempStore.push({
+                  characterCount: response.data.text[0].length,
+                  code: code,
+                  lang: self.supportedLanguages[code],
+                  translation: response.data.text[0]
+                });
+
+                // loading...
+                self.loadingWidth += divWidth / steps
+
+                if (i === self.selectedLanguages.length - 1) {
+                  self.isLoading = false
+                  self.output = tempStore
+                  self.loadingWidth = 0
+                }
+              }, function(response) {
+                console.log('ERROR!!!!!!!');
+              });
+            }
+
+            // translate for each code in selectedLanguages array
+            for (var i = 0; i < self.selectedLanguages.length; i++) {
+              getTranslation(i, self.selectedLanguages[i])
+            }
+          }
+        }, 1000),
+      selectLanguages: function(which) {
+        //var self = this;
+        this.selectedLanguages = []
+        this.output = []
+        if (which == 'all') {
+          // _.forEach(this.supportedLanguages, function(key, value) {
+          //   self.selectedLanguages.push(value);
+          // });
+          for (var lang in this.supportedLanguages) {
+            if (this.supportedLanguages.hasOwnProperty(lang)) {
+              this.selectedLanguages.push(lang)
+            }
+          }
+        }
+        this.translate();
+      },
+      selectText: function(e) {
+        console.log(e.target.value)
+      },
+      clearInput: function() {
+        this.word = ''
+        this.output = []
+      }
+    },
+    mounted() {
+      this.init()
+    }
+  }
+</script>
+
 <style lang='scss'>
   @import '../node_modules/html5-reset/assets/css/reset';
   @import 'assets/_fonts';
@@ -224,236 +368,3 @@
     opacity: 0;
   }
 </style>
-
-<template>
-  <div id="app">
-    <h1>Translate</h1>
-    <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
-    <div class="languages small">
-      <label v-for="(language, index) in supportedLanguages" v-bind:class="index">
-        <input class="language" type="checkbox" v-bind:value="index" v-model="selectedLanguages" @change="translate">{{ language }}
-      </label>
-    </div>
-    <div class="input-container">
-    <input ref="input" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
-    <div @click="clearInput" class="clear-input">×</div>
-    </div>
-    <div class="translation-cont" ref="translationCont">
-      <div class="loading" v-bind:style="{ width: loadingWidth + 'px' }" ></div>
-      <table class="output">
-        <thead class="small">
-          <tr>
-            <th>Language</th>
-            <th>Translation</th>
-            <th>Characters</th>
-          </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in sortOutput">
-          <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
-          <td><input @click="selectText" v-bind:class="item.code" class="translation" type="text" v-bind:value="item.translation" readonly></td>
-          <td>{{ item.characterCount }}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</template>
-
-<script>
-import _ from 'lodash'
-
-export default {
-  name: 'app',
-  data() {
-    return {
-      supportedLanguages: {
-        "nl": "Dutch",
-        "en": "English",
-        "fr": "French",
-        "de": "German",
-        "it": "Italian",
-        "pl": "Polish",
-        "pt": "Portuguese",
-        "ru": "Russian",
-        "es": "Spanish",
-        "tr": "Turkish",
-        "vi": "Vietnamese",
-        "ar": "Arabic",
-        "zh": "Chinese",
-        "ja": "Japanese",
-        "ko": "Korean",
-        "th": "Thai",
-        "af": "Afrikaans",
-        "sq": "Albanian",
-        "am": "Amharic",
-        "hy": "Armenian",
-        "az": "Azerbaijan",
-        "ba": "Bashkir",
-        "eu": "Basque",
-        "be": "Belarusian",
-        "bn": "Bengali",
-        "bs": "Bosnian",
-        "bg": "Bulgarian",
-        "ca": "Catalan",
-        "ceb": "Cebuano",
-        "hr": "Croatian",
-        "cs": "Czech",
-        "da": "Danish",
-        "eo": "Esperanto",
-        "et": "Estonian",
-        "fi": "Finnish",
-        "gl": "Galician",
-        "ka": "Georgian",
-        "el": "Greek",
-        "gu": "Gujarati",
-        "ht": "Haitian (Creole)",
-        "he": "Hebrew",
-        "mrj": "Hill Mari",
-        "hi": "Hindi",
-        "hu": "Hungarian",
-        "is": "Icelandic",
-        "id": "Indonesian",
-        "ga": "Irish",
-        "jv": "Javanese",
-        "kn": "Kannada",
-        "kk": "Kazakh",
-        "ky": "Kyrgyz",
-        "la": "Latin",
-        "lv": "Latvian",
-        "lt": "Lithuanian",
-        "mk": "Macedonian",
-        "mg": "Malagasy",
-        "ms": "Malay",
-        "ml": "Malayalam",
-        "mt": "Maltese",
-        "mi": "Maori",
-        "mr": "Marathi",
-        "mhr": "Mari",
-        "mn": "Mongolian",
-        "ne": "Nepali",
-        "no": "Norwegian",
-        "pap": "Papiamento",
-        "fa": "Persian",
-        "pa": "Punjabi",
-        "ro": "Romanian",
-        "gd": "Scottish Gaelic",
-        "sr": "Serbian",
-        "si": "Sinhala",
-        "sk": "Slovakian",
-        "sl": "Slovenian",
-        "su": "Sundanese",
-        "sw": "Swahili",
-        "sv": "Swedish",
-        "tl": "Tagalog",
-        "tg": "Tajik",
-        "ta": "Tamil",
-        "tt": "Tatar",
-        "te": "Telugu",
-        "udm": "Udmurt",
-        "uk": "Ukrainian",
-        "ur": "Urdu",
-        "uz": "Uzbek",
-        "cy": "Welsh",
-        "xh": "Xhosa",
-        "yi": "Yiddish"
-      },
-      selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
-      word: '',
-      output: [],
-      isLoading: false,
-      loadingWidth: 0
-    }
-  },
-  computed: {
-    sortOutput: function() {
-      //return _.orderBy(this.output, 'characterCount', 'desc');
-      return this.output.sort(function(a, b) {
-        return b.characterCount - a.characterCount;
-      });
-    },
-  },
-  watch: {
-    selectedLanguages: function() {
-      // if just removing, don't re-translate
-    },
-    word: function() {
-      this.translate();
-    }
-  },
-  methods: {
-    init: function() {
-      this.$refs.input.focus();
-    },
-    translate: _.debounce(
-      function() {
-        if (this.word == '') {
-          this.output = [];
-        } else {
-          this.output = [];
-
-          var self = this,
-              tempStore = [];
-              var divWidth = self.$refs.translationCont.clientWidth,
-                  steps = self.selectedLanguages.length;
-
-          var getTranslation = function(i, code) {
-            self.isLoading = true;
-            var text = self.word;
-            self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
-            .then(function(response) {
-              tempStore.push({
-                characterCount: response.data.text[0].length,
-                code: code,
-                lang: self.supportedLanguages[code],
-                translation: response.data.text[0]
-              });
-
-              // loading...
-              self.loadingWidth += divWidth / steps;
-
-              if (i === self.selectedLanguages.length - 1) {
-                self.isLoading = false;
-                self.output = tempStore;
-                self.loadingWidth = 0;
-              }
-            }, function(response) {
-              console.log('ERROR!!!!!!!');
-            });
-          }
-
-          // translate for each code in selectedLanguages array
-          for (var i = 0; i < self.selectedLanguages.length; i++) {
-            getTranslation(i, self.selectedLanguages[i]);
-          }
-        }
-      }, 1000),
-    selectLanguages: function(which) {
-      //var self = this;
-      this.selectedLanguages = [];
-      this.output = [];
-      if (which == 'all') {
-        // _.forEach(this.supportedLanguages, function(key, value) {
-        //   self.selectedLanguages.push(value);
-        // });
-        for (var lang in this.supportedLanguages) {
-          if (this.supportedLanguages.hasOwnProperty(lang)) {
-            this.selectedLanguages.push(lang);
-          }
-        }
-      }
-      this.translate();
-    },
-    selectText: function(e) {
-      console.log(e.target.value);
-    },
-    clearInput: function() {
-      this.word = '';
-      this.output = [];
-    }
-  },
-  mounted() {
-    this.init();
-  }
-}
-</script>
