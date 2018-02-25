@@ -77,9 +77,9 @@
             this.output = []
 
             var self = this,
-                tempStore = [];
-                var divWidth = self.$refs.translationCont.clientWidth,
-                    steps = self.selectedLanguages.length
+                tempStore = [],
+                divWidth = self.$refs.translationCont.clientWidth,
+                steps = self.selectedLanguages.length
 
             var getTranslation = function(i, code) {
               self.isLoading = true
