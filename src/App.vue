@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>Translate</h1>
+    <h1>Strings</h1>
     <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
     <div class="languages small">
       <label v-for="(language, index) in supportedLanguages" :class="index">
@@ -191,7 +191,7 @@
     font-size: 14px;
     line-height: 60px;
     padding-left: 30px;
-    background: url('http://www.ericpitcock.com/assets/img/e.svg') left center no-repeat;
+    background: url('http://www.ericpitcock.com/static/img/e.svg') left center no-repeat;
   }
 
   .select-control {
