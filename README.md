@@ -1,4 +1,6 @@
-# translate
+# Strings
+
+[strings.ericpitcock.com](http://strings.ericpitcock.com/)
 
 > A translation tool for designers
 
