@@ -2,7 +2,7 @@
 
 [strings.ericpitcock.com](http://strings.ericpitcock.com/)
 
-> A translation tool for designers
+> A string translation tool for designers. This is a development project. Once it works, I will make it pretty.
 
 ## Build Setup
 
