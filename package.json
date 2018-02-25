@@ -1,8 +1,8 @@
 {
-  "name": "translate",
+  "name": "strings",
   "version": "1.0.0",
-  "description": "A translation tool for designers",
   "author": "Eric Pitcock <git-43p@ericpitcock.com>",
+  "description": "A string translation tool for designers",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
