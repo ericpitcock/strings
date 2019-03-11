@@ -191,7 +191,7 @@
     font-size: 14px;
     line-height: 60px;
     padding-left: 30px;
-    background: url('http://www.ericpitcock.com/static/img/e.svg') left center no-repeat;
+    background: url('https://www.ericpitcock.com/static/img/e.svg') left center no-repeat;
   }
 
   .select-control {
