@@ -4,7 +4,7 @@
     <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
     <div class="languages small">
       <label v-for="(language, index) in supportedLanguages" :key="`lang-${index}`" :class="index">
-        <input class="language" type="checkbox" :value="index" v-model="selectedLanguages" @change="getTranslation">{{ language }}
+        <input class="language" type="checkbox" :value="index" v-model="selectedLanguages" @change="run()">{{ language }}
       </label>
     </div>
     <div class="input-container">
@@ -51,16 +51,15 @@
     },
     computed: {
       sortOutput: function() {
-        //return _.orderBy(this.output, 'characterCount', 'desc');
         return this.output.sort(function(a, b) {
           return b.characterCount - a.characterCount
-        });
-      },
+        })
+      }
     },
     watch: {
       selectedLanguages: function(value) {
         // calculate change
-        this.getTranslation(value)
+        this.run()
       },
       word: function(value) {
         if (value) this.run()
@@ -68,27 +67,26 @@
     },
     methods: {
       getTranslation(code) {
-          return fetch(
-            `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=${this.word}&lang=en-${code}`
-          )
-          .then(response => response.json())
-          .then(json => {
-            const translation = json.text[0]
-            return translation
-          })
+        return fetch(
+          `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=${this.word}&lang=en-${code}`
+        )
+        .then(response => response.json())
+        .then(json => {
+          return json.text[0]
+        })
+        .catch(error => console.log(error))
       },
       run: debounce(function() {
         this.selectedLanguages.forEach(lang => {
           this.getTranslation(lang).then(translation => {
-            console.log(translation)
+            this.output.push({
+              characterCount: translation.length,
+              code: lang,
+              lang: this.supportedLanguages[lang],
+              translation: translation
+            })
           })
         })
-        // return {
-        //       characterCount: response.text[0].length,
-        //       code: code,
-        //       lang: this.supportedLanguages[code],
-        //       translation: response.text[0]
-        //     }
       }, 1000),
       selectLanguages: function(which) {
         //var self = this;
@@ -104,7 +102,7 @@
             }
           }
         }
-        this.translate();
+        this.run()
       },
       selectText: function(e) {
         console.log(e.target.value)
