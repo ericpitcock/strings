@@ -4,7 +4,7 @@
     <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
     <div class="languages small">
       <label v-for="(language, index) in supportedLanguages" :key="`lang-${index}`" :class="index">
-        <input class="language" type="checkbox" :value="index" v-model="selectedLanguages" @change="translate">{{ language }}
+        <input class="language" type="checkbox" :value="index" v-model="selectedLanguages" @change="getTranslation">{{ language }}
       </label>
     </div>
     <div class="input-container">
@@ -58,79 +58,37 @@
       },
     },
     watch: {
-      selectedLanguages: function() {
-        // if just removing, don't re-translate
+      selectedLanguages: function(value) {
+        // calculate change
+        this.getTranslation(value)
       },
       word: function(value) {
-        // if (value) this.translate()
-        if (value) this.getTranslation(this.selectedLanguages)
+        if (value) this.run()
       }
     },
     methods: {
-      init: function() {
-        this.$refs.input.focus()
-      },
-      translate: debounce(
-        function() {
-          // if (this.word == '') {
-          //   this.output = []
-          // } else {
-            this.output = []
-
-            var self = this,
-                tempStore = [],
-                divWidth = self.$refs.translationCont.clientWidth,
-                steps = self.selectedLanguages.length
-
-            var getTranslation = function(i, code) {
-              self.isLoading = true
-              var text = self.word
-              self.$http.get('https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=' + text + '&lang=en-' + code + '')
-              .then(function(response) {
-                tempStore.push({
-                  characterCount: response.data.text[0].length,
-                  code: code,
-                  lang: self.supportedLanguages[code],
-                  translation: response.data.text[0]
-                });
-
-                // loading...
-                self.loadingWidth += divWidth / steps
-
-                if (i === self.selectedLanguages.length - 1) {
-                  self.isLoading = false
-                  self.output = tempStore
-                  self.loadingWidth = 0
-                }
-              }, function(response) {
-                console.log('ERROR!!!!!!!');
-              });
-            }
-
-            // translate for each code in selectedLanguages array
-            for (var i = 0; i < self.selectedLanguages.length; i++) {
-              getTranslation(i, self.selectedLanguages[i])
-            }
-          // }
-        }, 1000),
-      getTranslation: debounce(function(codes) {
-        codes.forEach(code => {
-          fetch(
+      getTranslation(code) {
+          return fetch(
             `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=${this.word}&lang=en-${code}`
           )
-          // .then(response => response.json())
-          // .then(response => console.log(response))
           .then(response => response.json())
-          .then(response => this.output.push(
-            {
-              characterCount: response.text[0].length,
-              code: code,
-              lang: this.supportedLanguages[code],
-              translation: response.text[0]
-            }
-            )
-          )
+          .then(json => {
+            const translation = json.text[0]
+            return translation
+          })
+      },
+      run: debounce(function() {
+        this.selectedLanguages.forEach(lang => {
+          this.getTranslation(lang).then(translation => {
+            console.log(translation)
+          })
         })
+        // return {
+        //       characterCount: response.text[0].length,
+        //       code: code,
+        //       lang: this.supportedLanguages[code],
+        //       translation: response.text[0]
+        //     }
       }, 1000),
       selectLanguages: function(which) {
         //var self = this;
@@ -157,7 +115,7 @@
       }
     },
     mounted() {
-      this.init()
+      this.$refs.input.focus()
     }
   }
 </script>
