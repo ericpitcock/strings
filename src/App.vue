@@ -3,13 +3,13 @@
     <h1>Strings</h1>
     <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
     <div class="languages small">
-      <label v-for="(language, index) in supportedLanguages" :class="index">
+      <label v-for="(language, index) in supportedLanguages" :key="`lang-${index}`" :class="index">
         <input class="language" type="checkbox" :value="index" v-model="selectedLanguages" @change="translate">{{ language }}
       </label>
     </div>
     <div class="input-container">
       <input ref="input" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
-      <div @click="clearInput" class="clear-input">×</div>
+      <div v-if="word" @click="clearInput" class="clear-input">×</div>
     </div>
     <div class="translation-cont" ref="translationCont">
       <div class="loading" :style="{ width: loadingWidth + 'px' }" ></div>
@@ -22,7 +22,7 @@
           </tr>
         </thead>
         <tbody>
-        <tr v-for="item in sortOutput">
+        <tr v-for="(item, index) in sortOutput" :key="`translation-${index}`">
           <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
           <td><input @click="selectText" :class="item.code" class="translation" type="text" :value="item.translation" readonly></td>
           <td>{{ item.characterCount }}</td>
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-  import _ from 'lodash'
+  import { debounce } from 'lodash'
   import supportedLanguages from '../static/languages.json'
 
   export default {
@@ -61,19 +61,20 @@
       selectedLanguages: function() {
         // if just removing, don't re-translate
       },
-      word: function() {
-        this.translate()
+      word: function(value) {
+        // if (value) this.translate()
+        if (value) this.getTranslation(this.selectedLanguages)
       }
     },
     methods: {
       init: function() {
         this.$refs.input.focus()
       },
-      translate: _.debounce(
+      translate: debounce(
         function() {
-          if (this.word == '') {
-            this.output = []
-          } else {
+          // if (this.word == '') {
+          //   this.output = []
+          // } else {
             this.output = []
 
             var self = this,
@@ -110,8 +111,27 @@
             for (var i = 0; i < self.selectedLanguages.length; i++) {
               getTranslation(i, self.selectedLanguages[i])
             }
-          }
+          // }
         }, 1000),
+      getTranslation: debounce(function(codes) {
+        codes.forEach(code => {
+          fetch(
+            `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=${this.word}&lang=en-${code}`
+          )
+          // .then(response => response.json())
+          // .then(response => console.log(response))
+          .then(response => response.json())
+          .then(response => this.output.push(
+            {
+              characterCount: response.text[0].length,
+              code: code,
+              lang: this.supportedLanguages[code],
+              translation: response.text[0]
+            }
+            )
+          )
+        })
+      }, 1000),
       selectLanguages: function(which) {
         //var self = this;
         this.selectedLanguages = []
@@ -148,8 +168,8 @@
 
   @mixin block() {
     background: #fff;
-    border: 1px solid #ccc;
-    box-shadow: 0 1px 10px rgba(0,0,0,.1);
+    // border: 1px solid #ccc;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.05);
     &::-webkit-scrollbar {
       display: none;
     }
