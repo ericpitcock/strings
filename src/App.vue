@@ -3,8 +3,8 @@
     <h1>Strings</h1>
     <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
     <div class="languages small">
-      <label v-for="(language, index) in supportedLanguages" :key="`lang-${index}`" :class="index">
-        <input class="language" type="checkbox" :value="index" v-model="selectedLanguages" @change="run()">{{ language }}
+      <label v-for="(language, code) in supportedLanguages" :key="`lang-${code}`" :class="code">
+        <input class="language" type="checkbox" :value="code" :checked="selectedLanguages.includes(code)" @change="handleSelectedLanguagesChange(code, $event)">{{ language }}
       </label>
     </div>
     <div class="input-container">
@@ -12,7 +12,7 @@
       <div v-if="word" @click="clearInput" class="clear-input">×</div>
     </div>
     <div class="translation-cont" ref="translationCont">
-      <div class="loading" :style="{ width: loadingWidth + 'px' }" ></div>
+      <div v-show="isLoading" class="loading"></div>
       <table class="output">
         <thead class="small">
           <tr>
@@ -59,10 +59,14 @@
     watch: {
       selectedLanguages: function(value) {
         // calculate change
+        this.isLoading = true
         this.run()
       },
       word: function(value) {
-        if (value) this.run()
+        if (this.word != '') {
+          this.isLoading = true
+          if (value) this.run()
+        }
       }
     },
     methods: {
@@ -76,6 +80,20 @@
         })
         .catch(error => console.log(error))
       },
+      handleSelectedLanguagesChange(code, event) {
+        // use new Set to get unqiue values of new and old arrays MAYBE
+        if (event.target.checked) {
+          // add it
+        } else {
+          // remove it
+        }
+        const old = this.selectedLanguages
+        if (old.includes(code)) {
+          // remove it
+        } else {
+          // add it
+        }
+      },
       run: debounce(function() {
         this.selectedLanguages.forEach(lang => {
           this.getTranslation(lang).then(translation => {
@@ -87,6 +105,7 @@
             })
           })
         })
+        this.isLoading = false
       }, 1000),
       selectLanguages: function(which) {
         //var self = this;
@@ -110,6 +129,7 @@
       clearInput: function() {
         this.word = ''
         this.output = []
+        this.isLoading = false
       }
     },
     mounted() {
@@ -279,9 +299,15 @@
     overflow: scroll;
     @include block();
     .loading {
-      height: 2px;
       position: absolute;
-      background: red;
+      // width: 100%;
+      // height: 100%;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+      background: white url('/static/img/loading.svg') center center no-repeat;
     }
     table.output {
       width: 100%;
@@ -290,7 +316,7 @@
       thead {
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: blue;
+        // color: blue;
         tr {
           border-bottom: 1px solid $light-gray;
         }
