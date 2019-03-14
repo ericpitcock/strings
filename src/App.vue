@@ -70,7 +70,7 @@
       word: function(newValue, oldValue) {
         if (this.word != '') {
           this.isLoading = true
-          if (newValue) this.debouncedRun()
+          if (newValue) this.debouncedRun(this.selectedLanguages)
         }
       }
     },
@@ -87,32 +87,15 @@
       },
       handleSelectedLanguagesChange(newValue, oldValue) {
         if (newValue.length < oldValue.length) {
-          // remove just that from this.output
-          // const removed = difference(oldValue, newValue)
-          // pull(selectedLanguages, difference(oldValue, newValue))
           console.log(`You removed: ${difference(oldValue, newValue)}`)
           this.output = this.output.filter(lang => lang.code != difference(oldValue, newValue))
-
         } else if (newValue.length > oldValue.length) {
-          // push just that to this.output
           console.log(`You added: ${difference(newValue, oldValue)}`)
-          
+          this.run(difference(newValue, oldValue))
         }
-        // use new Set to get unqiue values of new and old arrays MAYBE
-        // if (event.target.checked) {
-        //   // add it
-        // } else {
-        //   // remove it
-        // }
-        // const old = this.selectedLanguages
-        // if (old.includes(code)) {
-        //   // remove it
-        // } else {
-        //   // add it
-        // }
       },
-      run() {
-        this.selectedLanguages.forEach(lang => {
+      run(codes) {
+        codes.forEach(lang => {
           this.getTranslation(lang).then(translation => {
             this.output.push({
               characterCount: translation.length,
