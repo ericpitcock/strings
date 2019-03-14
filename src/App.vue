@@ -90,10 +90,12 @@
       },
       handleSelectedLanguagesChange(newValue, oldValue) {
         if (newValue.length < oldValue.length) {
-          console.log(`You removed: ${difference(oldValue, newValue)}`)
-          this.output = this.output.filter(lang => lang.code != difference(oldValue, newValue))
+          // console.log(`You removed: ${difference(oldValue, newValue)}`)
+          this.output = this.output.filter(lang => {
+            return lang.code != difference(oldValue, newValue)
+          })
         } else if (newValue.length > oldValue.length) {
-          console.log(`You added: ${difference(newValue, oldValue)}`)
+          // console.log(`You added: ${difference(newValue, oldValue)}`)
           this.run(difference(newValue, oldValue))
         }
       },
