@@ -21,13 +21,15 @@
             <th>Characters</th>
           </tr>
         </thead>
-        <tbody>
+        <!-- <tbody> -->
+        <transition-group name="fade" tag="tbody">
         <tr v-for="(item, index) in sortOutput" :key="`translation-${index}`">
           <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
           <td><input @click="selectText" :class="item.code" class="translation" type="text" :value="item.translation" readonly></td>
           <td>{{ item.characterCount }}</td>
         </tr>
-        </tbody>
+        </transition-group>
+        <!-- </tbody> -->
       </table>
     </div>
   </div>
@@ -42,7 +44,8 @@
     data() {
       return {
         supportedLanguages,
-        selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
+        // selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
+        selectedLanguages: ['fr','de','it','vi'],
         word: '',
         output: [],
         isLoading: false,
@@ -363,10 +366,10 @@
   }
 
   .fade-enter-active {
-    transition: opacity 1s ease-in-out;
+    transition: opacity .2s ease-in-out;
   }
   .fade-leave-active {
-    transition: opacity .3s ease-in-out;
+    transition: opacity .2s ease-in-out;
   }
   .fade-enter, .fade-leave-to {
     opacity: 0;
