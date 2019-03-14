@@ -36,7 +36,7 @@
 </template>
 
 <script>
-  import { debounce, difference, pull } from 'lodash'
+  import { debounce, difference, keys, pull } from 'lodash'
   import supportedLanguages from '../static/languages.json'
 
   export default {
@@ -65,7 +65,7 @@
         this.handleSelectedLanguagesChange(newValue, oldValue)
       },
       word: function(newValue, oldValue) {
-        if (this.word != '') {
+        if (this.word && this.selectedLanguages.length > 0) {
           this.isLoading = true
           this.output = []
           if (newValue != oldValue) this.debouncedRun(this.selectedLanguages)
@@ -85,15 +85,18 @@
       },
       handleSelectedLanguagesChange(newValue, oldValue) {
         if (this.word) {
-          if (newValue.length < oldValue.length) {
-            // console.log(`You removed: ${difference(oldValue, newValue)}`)
+          if (newValue.length <= oldValue.length) {
+            console.log(`You removed: ${difference(oldValue, newValue)}`)
             this.output = this.output.filter(lang => {
               return lang.code != difference(oldValue, newValue)
             })
+            if (this.selectedLanguages.length == 0) { this.isLoading = false }
           } else if (newValue.length > oldValue.length) {
-            // console.log(`You added: ${difference(newValue, oldValue)}`)
+            console.log(`You added: ${difference(newValue, oldValue)}`)
             this.debouncedRun(difference(newValue, oldValue))
           }
+        } else {
+          this.isLoading = false
         }
       },
       async run(codes) {
@@ -112,21 +115,14 @@
         this.isLoading = false
       },
       selectLanguages: function(which) {
-        //var self = this;
-        this.selectedLanguages = []
-        this.output = []
         if (which == 'all') {
-          // _.forEach(this.supportedLanguages, function(key, value) {
-          //   self.selectedLanguages.push(value);
-          // });
-          for (var lang in this.supportedLanguages) {
-            if (this.supportedLanguages.hasOwnProperty(lang)) {
-              this.selectedLanguages.push(lang)
-            }
-          }
+          this.selectedLanguages = keys(this.supportedLanguages)
           this.debouncedRun(this.selectedLanguages)
-        } else {
+        } else if (which == 'none') {
+          this.selectedLanguages = []
           this.output = []
+          this.isLoading = false
+          console.log('none')
         }
       },
       selectText: function(e) {
@@ -314,7 +310,7 @@
       bottom: 0;
       left: 0;
       z-index: 2;
-      background: url('/static/img/loading.svg') top 10px right 10px no-repeat;
+      background: url('/static/img/loading.svg') top 10px left 10px no-repeat;
     }
     table.output {
       width: 100%;
