@@ -61,19 +61,14 @@
     },
     watch: {
       selectedLanguages: function(newValue, oldValue) {
-        // calculate change
-        // console.log(`old: ${oldValue}`)
-        // console.log(`new: ${newValue}`)
+        this.isLoading = true
         this.handleSelectedLanguagesChange(newValue, oldValue)
-        
-        
-        // this.isLoading = true
-        // this.debouncedRun()
       },
       word: function(newValue, oldValue) {
         if (this.word != '') {
           this.isLoading = true
-          if (newValue) this.debouncedRun(this.selectedLanguages)
+          this.output = []
+          if (newValue != oldValue) this.debouncedRun(this.selectedLanguages)
         }
       }
     },
@@ -89,29 +84,32 @@
         .catch(error => console.log(error))
       },
       handleSelectedLanguagesChange(newValue, oldValue) {
-        if (newValue.length < oldValue.length) {
-          // console.log(`You removed: ${difference(oldValue, newValue)}`)
-          this.output = this.output.filter(lang => {
-            return lang.code != difference(oldValue, newValue)
-          })
-        } else if (newValue.length > oldValue.length) {
-          // console.log(`You added: ${difference(newValue, oldValue)}`)
-          this.run(difference(newValue, oldValue))
+        if (this.word) {
+          if (newValue.length < oldValue.length) {
+            // console.log(`You removed: ${difference(oldValue, newValue)}`)
+            this.output = this.output.filter(lang => {
+              return lang.code != difference(oldValue, newValue)
+            })
+          } else if (newValue.length > oldValue.length) {
+            // console.log(`You added: ${difference(newValue, oldValue)}`)
+            this.debouncedRun(difference(newValue, oldValue))
+          }
         }
       },
-      run(codes) {
-        codes.forEach(lang => {
-          this.getTranslation(lang).then(translation => {
-            this.output.push({
-              characterCount: translation.length,
-              code: lang,
-              lang: this.supportedLanguages[lang],
-              translation: translation
+      async run(codes) {
+        if (this.word) {
+          await codes.forEach(lang => {
+            this.getTranslation(lang).then(translation => {
+              this.output.push({
+                characterCount: translation.length,
+                code: lang,
+                lang: this.supportedLanguages[lang],
+                translation: translation
+              })
             })
           })
-        })
+        }
         this.isLoading = false
-        console.log(this.output)
       },
       selectLanguages: function(which) {
         //var self = this;
@@ -126,8 +124,10 @@
               this.selectedLanguages.push(lang)
             }
           }
+          this.debouncedRun(this.selectedLanguages)
+        } else {
+          this.output = []
         }
-        this.debouncedRun()
       },
       selectText: function(e) {
         console.log(e.target.value)
