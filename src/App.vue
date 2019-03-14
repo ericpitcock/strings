@@ -61,12 +61,12 @@
     },
     watch: {
       selectedLanguages: function(newValue, oldValue) {
-        this.isLoading = true
+        // this.isLoading = true
         this.handleSelectedLanguagesChange(newValue, oldValue)
       },
       word: function(newValue, oldValue) {
         if (this.word != '') {
-          this.isLoading = true
+          // this.isLoading = true
           this.output = []
           if (newValue != oldValue) this.debouncedRun(this.selectedLanguages)
         }
@@ -109,7 +109,7 @@
             })
           })
         }
-        this.isLoading = false
+        // this.isLoading = false
       },
       selectLanguages: function(which) {
         //var self = this;
@@ -135,7 +135,7 @@
       clearInput: function() {
         this.word = ''
         this.output = []
-        this.isLoading = false
+        // this.isLoading = false
       }
     },
     created() {
@@ -323,7 +323,6 @@
       thead {
         text-transform: uppercase;
         letter-spacing: 1px;
-        // color: blue;
         tr {
           border-bottom: 1px solid $light-gray;
         }
@@ -339,7 +338,7 @@
             background: #f9f9f9;
           }
           td {
-            height: 40px;
+            height: 70px;
             vertical-align: middle;
             span.lang-label {
               display: inline-block;
