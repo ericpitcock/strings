@@ -61,12 +61,12 @@
     },
     watch: {
       selectedLanguages: function(newValue, oldValue) {
-        // this.isLoading = true
+        this.isLoading = true
         this.handleSelectedLanguagesChange(newValue, oldValue)
       },
       word: function(newValue, oldValue) {
         if (this.word != '') {
-          // this.isLoading = true
+          this.isLoading = true
           this.output = []
           if (newValue != oldValue) this.debouncedRun(this.selectedLanguages)
         }
@@ -109,7 +109,7 @@
             })
           })
         }
-        // this.isLoading = false
+        this.isLoading = false
       },
       selectLanguages: function(which) {
         //var self = this;
@@ -135,7 +135,7 @@
       clearInput: function() {
         this.word = ''
         this.output = []
-        // this.isLoading = false
+        this.isLoading = false
       }
     },
     created() {
@@ -314,7 +314,7 @@
       bottom: 0;
       left: 0;
       z-index: 2;
-      background: white url('/static/img/loading.svg') center center no-repeat;
+      background: url('/static/img/loading.svg') top 10px right 10px no-repeat;
     }
     table.output {
       width: 100%;
