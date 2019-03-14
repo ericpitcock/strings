@@ -4,7 +4,7 @@
     <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
     <div class="languages small">
       <label v-for="(language, code) in supportedLanguages" :key="`lang-${code}`" :class="code">
-        <input class="language" type="checkbox" :value="code" :checked="selectedLanguages.includes(code)" @change="handleSelectedLanguagesChange(code, $event)">{{ language }}
+        <input class="language" type="checkbox" :value="code" v-model="selectedLanguages">{{ language }}
       </label>
     </div>
     <div class="input-container">
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-  import { debounce } from 'lodash'
+  import { debounce, difference, pull } from 'lodash'
   import supportedLanguages from '../static/languages.json'
 
   export default {
@@ -57,15 +57,20 @@
       }
     },
     watch: {
-      selectedLanguages: function(value) {
+      selectedLanguages: function(newValue, oldValue) {
         // calculate change
-        this.isLoading = true
-        this.run()
+        // console.log(`old: ${oldValue}`)
+        // console.log(`new: ${newValue}`)
+        this.handleSelectedLanguagesChange(newValue, oldValue)
+        
+        
+        // this.isLoading = true
+        // this.debouncedRun()
       },
-      word: function(value) {
+      word: function(newValue, oldValue) {
         if (this.word != '') {
           this.isLoading = true
-          if (value) this.run()
+          if (newValue) this.debouncedRun()
         }
       }
     },
@@ -80,21 +85,33 @@
         })
         .catch(error => console.log(error))
       },
-      handleSelectedLanguagesChange(code, event) {
+      handleSelectedLanguagesChange(newValue, oldValue) {
+        if (newValue.length < oldValue.length) {
+          // remove just that from this.output
+          // const removed = difference(oldValue, newValue)
+          // pull(selectedLanguages, difference(oldValue, newValue))
+          console.log(`You removed: ${difference(oldValue, newValue)}`)
+          this.output = this.output.filter(lang => lang.code != difference(oldValue, newValue))
+
+        } else if (newValue.length > oldValue.length) {
+          // push just that to this.output
+          console.log(`You added: ${difference(newValue, oldValue)}`)
+          
+        }
         // use new Set to get unqiue values of new and old arrays MAYBE
-        if (event.target.checked) {
-          // add it
-        } else {
-          // remove it
-        }
-        const old = this.selectedLanguages
-        if (old.includes(code)) {
-          // remove it
-        } else {
-          // add it
-        }
+        // if (event.target.checked) {
+        //   // add it
+        // } else {
+        //   // remove it
+        // }
+        // const old = this.selectedLanguages
+        // if (old.includes(code)) {
+        //   // remove it
+        // } else {
+        //   // add it
+        // }
       },
-      run: debounce(function() {
+      run() {
         this.selectedLanguages.forEach(lang => {
           this.getTranslation(lang).then(translation => {
             this.output.push({
@@ -106,7 +123,8 @@
           })
         })
         this.isLoading = false
-      }, 1000),
+        console.log(this.output)
+      },
       selectLanguages: function(which) {
         //var self = this;
         this.selectedLanguages = []
@@ -121,7 +139,7 @@
             }
           }
         }
-        this.run()
+        this.debouncedRun()
       },
       selectText: function(e) {
         console.log(e.target.value)
@@ -131,6 +149,9 @@
         this.output = []
         this.isLoading = false
       }
+    },
+    created() {
+      this.debouncedRun = debounce(this.run, 1000)
     },
     mounted() {
       this.$refs.input.focus()
