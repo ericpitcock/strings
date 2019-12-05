@@ -21,7 +21,6 @@
             <th>Characters</th>
           </tr>
         </thead>
-        <!-- <tbody> -->
         <transition-group name="fade" tag="tbody">
         <tr v-for="(item, index) in sortOutput" :key="`translation-${index}`">
           <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
@@ -29,7 +28,6 @@
           <td>{{ item.characterCount }}</td>
         </tr>
         </transition-group>
-        <!-- </tbody> -->
       </table>
     </div>
   </div>
@@ -44,8 +42,7 @@
     data() {
       return {
         supportedLanguages,
-        // selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
-        selectedLanguages: ['fr','de','it','vi'],
+        selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
         word: '',
         output: [],
         isLoading: false,
@@ -53,18 +50,16 @@
       }
     },
     computed: {
-      sortOutput: function() {
-        return this.output.sort(function(a, b) {
-          return b.characterCount - a.characterCount
-        })
+      sortOutput() {
+        return this.output.sort((a, b) => b.characterCount - a.characterCount)
       }
     },
     watch: {
-      selectedLanguages: function(newValue, oldValue) {
+      selectedLanguages(newValue, oldValue) {
         this.isLoading = true
         this.handleSelectedLanguagesChange(newValue, oldValue)
       },
-      word: function(newValue, oldValue) {
+      word(newValue, oldValue) {
         if (this.word && this.selectedLanguages.length > 0) {
           this.isLoading = true
           this.output = []
@@ -114,7 +109,7 @@
         }
         this.isLoading = false
       },
-      selectLanguages: function(which) {
+      selectLanguages(which) {
         if (which == 'all') {
           this.selectedLanguages = keys(this.supportedLanguages)
           this.debouncedRun(this.selectedLanguages)
@@ -125,10 +120,10 @@
           console.log('none')
         }
       },
-      selectText: function(e) {
+      selectText(e) {
         console.log(e.target.value)
       },
-      clearInput: function() {
+      clearInput() {
         this.word = ''
         this.output = []
         this.isLoading = false
