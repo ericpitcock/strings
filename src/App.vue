@@ -1,18 +1,55 @@
 <template>
   <div id="app">
     <h1>Strings</h1>
-    <div class="select-control"><button @click="selectLanguages('all')" class="select-all" type="button" name="button">All</button> <button @click="selectLanguages('none')" class="select-none" type="button" name="button">None</button></div>
+    <div class="select-control"><button
+        @click="selectLanguages('all')"
+        class="select-all"
+        type="button"
+        name="button"
+      >All</button> <button
+        @click="selectLanguages('none')"
+        class="select-none"
+        type="button"
+        name="button"
+      >None</button></div>
     <div class="languages small">
-      <label v-for="(language, code) in supportedLanguages" :key="`lang-${code}`" :class="code">
-        <input class="language" type="checkbox" :value="code" v-model="selectedLanguages">{{ language }}
+      <label
+        v-for="(language, code) in supportedLanguages"
+        :key="`lang-${code}`"
+        :class="code"
+      >
+        <input
+          class="language"
+          type="checkbox"
+          :value="code"
+          v-model="selectedLanguages"
+        >{{ language }}
       </label>
     </div>
     <div class="input-container">
-      <input ref="input" v-model="word" class="word-input" type="text" name="word" placeholder="Enter word" autocomplete="off">
-      <div v-if="word" @click="clearInput" class="clear-input">×</div>
+      <input
+        ref="input"
+        v-model="word"
+        class="word-input"
+        type="text"
+        name="word"
+        placeholder="Enter word"
+        autocomplete="off"
+      >
+      <div
+        v-if="word"
+        @click="clearInput"
+        class="clear-input"
+      >×</div>
     </div>
-    <div class="translation-cont" ref="translationCont">
-      <div v-show="isLoading" class="loading"></div>
+    <div
+      class="translation-cont"
+      ref="translationCont"
+    >
+      <div
+        v-show="isLoading"
+        class="loading"
+      ></div>
       <table class="output">
         <thead class="small">
           <tr>
@@ -21,12 +58,26 @@
             <th>Characters</th>
           </tr>
         </thead>
-        <transition-group name="fade" tag="tbody">
-        <tr v-for="(item, index) in sortOutput" :key="`translation-${index}`">
-          <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span></td>
-          <td><input @click="selectText" :class="item.code" class="translation" type="text" :value="item.translation" readonly></td>
-          <td>{{ item.characterCount }}</td>
-        </tr>
+        <transition-group
+          name="fade"
+          tag="tbody"
+        >
+          <tr
+            v-for="(item, index) in sortOutput"
+            :key="`translation-${index}`"
+          >
+            <td>{{ item.lang }}<span class="lang-label">{{ item.code }}</span>
+            </td>
+            <td><input
+                @click="selectText"
+                :class="item.code"
+                class="translation"
+                type="text"
+                :value="item.translation"
+                readonly
+              ></td>
+            <td>{{ item.characterCount }}</td>
+          </tr>
         </transition-group>
       </table>
     </div>
@@ -42,7 +93,7 @@
     data() {
       return {
         supportedLanguages,
-        selectedLanguages: ['nl','en','fr','de','it','pl','pt','ru','es','tr','vi','ar','zh','ja','ko','th'],
+        selectedLanguages: ['nl', 'en', 'fr', 'de', 'it', 'pl', 'pt', 'ru', 'es', 'tr', 'vi', 'ar', 'zh', 'ja', 'ko', 'th'],
         word: '',
         output: [],
         isLoading: false,
@@ -72,11 +123,11 @@
         return fetch(
           `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=${this.word}&lang=en-${code}`
         )
-        .then(response => response.json())
-        .then(json => {
-          return json.text[0]
-        })
-        .catch(error => console.log(error))
+          .then(response => response.json())
+          .then(json => {
+            return json.text[0]
+          })
+          .catch(error => console.log(error))
       },
       handleSelectedLanguagesChange(newValue, oldValue) {
         if (this.word) {
@@ -145,7 +196,8 @@
   @mixin block() {
     background: #fff;
     // border: 1px solid #ccc;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -153,9 +205,13 @@
 
   $light-gray: #e6e6e6;
 
-  html { overflow: hidden; }
+  html {
+    overflow: hidden;
+  }
 
-  body, input, textarea {
+  body,
+  input,
+  textarea {
     font-family: 'Noto Sans', sans-serif;
     font-size: 14px;
     font-weight: 400;
@@ -187,7 +243,8 @@
     font-size: 14px;
     line-height: 60px;
     padding-left: 30px;
-    background: url('https://www.ericpitcock.com/static/img/e.svg') left center no-repeat;
+    background: url('/static/img/e.svg') left center no-repeat;
+    background-size: 20px;
   }
 
   .select-control {
@@ -197,6 +254,7 @@
     text-align: right;
     width: 200px;
     z-index: 1;
+
     button {
       border: none;
       background: none;
@@ -206,9 +264,11 @@
       color: red;
       text-transform: uppercase;
       letter-spacing: 1px;
+
       &:hover {
         color: black;
       }
+
       &:focus {
         outline: none;
       }
@@ -224,22 +284,27 @@
     overflow: scroll;
     padding: 26px 30px 30px 30px;
     @include block();
+
     label {
       display: block;
       margin-bottom: 10px;
-      &:hover {
-      }
+
+      &:hover {}
+
       input {
         margin-right: 5px;
         vertical-align: baseline;
+
         &:hover {
           cursor: pointer;
         }
+
         &:focus {
           outline: none;
         }
       }
     }
+
     .th {
       padding-bottom: 20px;
       border-bottom: 1px solid $light-gray;
@@ -254,6 +319,7 @@
     width: 100%;
     max-width: 450px;
     height: 60px;
+
     input.word-input {
       width: 100%;
       height: 100%;
@@ -263,15 +329,18 @@
       @include block();
       transition: all .2s ease-in-out;
       -webkit-appearance: none;
+
       &::placeholder {
         color: black;
       }
+
       &:focus {
         outline: none;
         border-color: #999;
-        box-shadow: 0px 6px 15px rgba(0,0,0,.1);
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, .1);
       }
     }
+
     .clear-input {
       position: absolute;
       top: 0;
@@ -283,6 +352,7 @@
       line-height: 56px;
       text-align: center;
       color: #ccc;
+
       &:hover {
         color: red;
       }
@@ -298,6 +368,7 @@
     max-width: 700px;
     overflow: scroll;
     @include block();
+
     .loading {
       position: absolute;
       top: 0;
@@ -307,30 +378,38 @@
       z-index: 2;
       background: url('/static/img/loading.svg') top 10px left 10px no-repeat;
     }
+
     table.output {
       width: 100%;
       margin: 30px 0;
       text-align: left;
+
       thead {
         text-transform: uppercase;
         letter-spacing: 1px;
+
         tr {
           border-bottom: 1px solid $light-gray;
         }
+
         th {
           width: 33.333%;
           padding-bottom: 10px;
         }
       }
+
       tbody {
         tr {
           border-bottom: 1px solid $light-gray;
+
           &:nth-child(odd) {
             background: #f9f9f9;
           }
+
           td {
             height: 70px;
             vertical-align: middle;
+
             span.lang-label {
               display: inline-block;
               font-size: 10px;
@@ -339,10 +418,12 @@
               color: #999;
               padding-left: 5px;
             }
+
             input.translation {
               border: none;
               background: none;
               cursor: pointer;
+
               &:hover {
                 color: red;
               }
@@ -350,6 +431,7 @@
           }
         }
       }
+
       th:first-child,
       td:first-child {
         padding-left: 30px;
@@ -360,10 +442,13 @@
   .fade-enter-active {
     transition: opacity .2s ease-in-out;
   }
+
   .fade-leave-active {
     transition: opacity .2s ease-in-out;
   }
-  .fade-enter, .fade-leave-to {
+
+  .fade-enter,
+  .fade-leave-to {
     opacity: 0;
   }
 </style>
