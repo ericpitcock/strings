@@ -155,10 +155,10 @@
           await codes.forEach(lang => {
             this.getTranslation(lang).then(translation => {
               this.output.push({
-                characterCount: translation.length,
+                characterCount: translation ? translation.length : 0,
                 code: lang,
                 lang: this.supportedLanguages[lang],
-                translation: translation
+                translation: translation ? translation : 'No translation'
               })
             })
           })
