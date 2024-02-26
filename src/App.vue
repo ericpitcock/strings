@@ -93,7 +93,7 @@
     data() {
       return {
         supportedLanguages,
-        selectedLanguages: ['nl', 'en', 'fr', 'de', 'it', 'pl', 'pt', 'ru', 'es', 'tr', 'vi', 'ar', 'zh', 'ja', 'ko', 'th'],
+        selectedLanguages: ['nl', 'fr', 'de', 'it', 'pl', 'pt', 'ru', 'es', 'tr', 'vi', 'ar', 'zh', 'ja', 'ko', 'th'],
         word: '',
         output: [],
         isLoading: false,
@@ -120,14 +120,19 @@
     },
     methods: {
       getTranslation(code) {
-        return fetch(
-          `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20161205T032544Z.7e1492088f252553.93da07ad618b8fef174afcdf00b72efa811e0388&text=${this.word}&lang=en-${code}`
-        )
+        const url = `https://translated-mymemory---translation-memory.p.rapidapi.com/get?langpair=en%7C${code}&q=${this.word}`
+        const options = {
+          method: 'GET',
+          headers: {
+            'X-RapidAPI-Key': '04f37d112emsh57fe5431cecee95p15a111jsn77a29e85c890',
+            'X-RapidAPI-Host': 'translated-mymemory---translation-memory.p.rapidapi.com'
+          }
+        }
+
+        return fetch(url, options)
           .then(response => response.json())
-          .then(json => {
-            return json.text[0]
-          })
-          .catch(error => console.log(error))
+          .then(data => data.responseData.translatedText)
+          .catch(error => console.error('Error:', error))
       },
       handleSelectedLanguagesChange(newValue, oldValue) {
         if (this.word) {
